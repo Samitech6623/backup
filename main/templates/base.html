@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block head %}    <title>{% block title %}Edenfield Kindergarten{% endblock %}</title>
+    {% endblock %}
+</head>
+<body>
+    <header>
+        
+        <h1>
+            <div class="school-logo-container"><img src="{% static 'images/logo.jpeg' %}" alt="Edenfield"></div>
+          <div>
+            <div>Edenfield</div> 
+            <div>Kindergarten</div>
+        </div>  
+        </h1>
+        <nav>
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'about' %}">About</a>
+            <a href="{% url 'classes' %}">Classes</a>
+            <a href="{% url 'contact' %}">Contact</a>
+            <a href=""><button class="register-button">register</button></a>
+            <a href=""><button class="logIn-button">log in</button></a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <h4>Reach Us</h4>
+            <p>WhatsApp: 07******** | Call: 07*******/07*****</p>
+            <p class="credit">Created by <strong>@Samitech Technologies</strong> | 0791577972</p>
+            <p class="copyright">
+                &copy; 2025 Edenfield Kindergarten. All rights reserved.
+            </p>
+        </div>
+    </footer>
+    
+    
+    
+</body>
+</html>

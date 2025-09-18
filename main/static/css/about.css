@@ -1,0 +1,92 @@
+
+        .hero {
+            
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin: 0;
+        }
+
+        .section {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        .section h2 {
+            color: rgb(165, 112, 42);
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .section p {
+            line-height: 1.6;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .values {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .value-box {
+            flex: 1 1 200px;
+            background-color: #f3e5c2;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .programmes {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .programme-card {
+            flex: 1 1 220px;
+            background-color: #fff2dc;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .cta {
+            background-color: transparent;
+            color: rgb(165, 112, 42);
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 60px;
+        }
+
+        .cta h3 {
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+
+        .cta a {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #fff;
+            color: rgb(165, 112, 42);
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+        }
