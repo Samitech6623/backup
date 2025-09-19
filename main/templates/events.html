@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Calendar & Events | Edenfield Kindergarten{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Calendar & Upcoming Events</h1>
+    <p>Stay up-to-date with all the exciting activities and important dates at Edenfield Kindergarten!</p>
+
+    <div class="events-list mt-4">
+        {% for event in events %}
+            <div class="event-item">
+                <div class="event-date">
+                    <span class="event-day">{{ event.date|date:"d" }}</span>
+                    <span class="event-month">{{ event.date|date:"M" }}</span>
+                </div>
+                <div class="event-details">
+                    <h3 class="event-title">{{ event.title }}</h3>
+                    <p class="event-description">{{ event.description }}</p>
+                </div>
+            </div>
+        {% empty %}
+            <p>No upcoming events at the moment. Please check back soon!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

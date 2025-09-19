@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Gallery | Edenfield Kindergarten{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Our Gallery</h1>
+    <p>Take a peek into the joyful and creative world of Edenfield Kindergarten! Here's a glimpse of our little learners in action.</p>
+
+    <div class="gallery-grid mt-4">
+        {% for image in images %}
+            <div class="gallery-item">
+                <img src="{{ image.url }}" alt="{{ image.alt }}" class="gallery-img">
+            </div>
+        {% empty %}
+            <p>No images available right now. Please check back soon!</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

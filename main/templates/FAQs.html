@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}FAQs | Edenfield Kindergarten{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Frequently Asked Questions</h1>
+    <p>Got a question? We might already have the answer below!</p>
+
+    <div class="faq-section mt-4">
+        <div class="faq-item">
+            <button class="faq-question">What are your school hours?</button>
+            <div class="faq-answer">
+                <p>We are open Monday to Friday from 8:00 AM to 3:30 PM. Aftercare is available until 5:00 PM.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">What age groups do you accept?</button>
+            <div class="faq-answer">
+                <p>We accept children aged 2 to 5 years.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">Do you provide meals?</button>
+            <div class="faq-answer">
+                <p>Yes! We provide healthy snacks and lunch daily, all prepared fresh in our on-site kitchen.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">How can I schedule a tour?</button>
+            <div class="faq-answer">
+                <p>You can <a href="{% url 'contact' %}">contact us here</a> to book a tour at your conve

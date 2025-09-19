@@ -1,0 +1,105 @@
+/* style.css */
+
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* Container */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px 20px;
+}
+
+/* Headings */
+h1, h2, h3 {
+    color: #2a7d62;
+    margin-bottom: 0.5em;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 1.8rem;
+}
+
+p {
+    margin-bottom: 1rem;
+}
+
+/* Lists */
+ol {
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+ol li {
+    margin-bottom: 0.5rem;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+.btn-primary {
+    background-color: #ffb347;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #ffa733;
+}
+
+.btn-success {
+    background-color: #6ac47e;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #57ad6a;
+}
+
+.btn-lg {
+    font-size: 1.2rem;
+    padding: 14px 28px;
+}
+
+/* Links */
+a {
+    color: #2a7d62;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.4rem;
+    }
+
+    .btn-lg {
+        width: 100%;
+        text-align: center;
+    }
+}

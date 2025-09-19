@@ -22,8 +22,16 @@
             <a href="{% url 'about' %}">About</a>
             <a href="{% url 'classes' %}">Classes</a>
             <a href="{% url 'contact' %}">Contact</a>
-            <a href=""><button class="register-button">register</button></a>
-            <a href=""><button class="logIn-button">log in</button></a>
+             <div class="dropdown">
+        <a href="" class="dropbtn">More</a>
+        <ul class="dropdown-content">
+               <li><a href="{% url 'admission' %}">Admission</a></li>
+               <li><a href="">Gallery</a></li>
+               <li><a href="">Calendar & Events</a></li>
+               <li><a href="">FAQs</a></li>
+            </ul>
+             </div>
+            <a href=""><button class="register-button">Portal</button></a>
         </nav>
     </header>
 

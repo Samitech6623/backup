@@ -45,6 +45,43 @@ nav a {
 nav a:hover{
     text-decoration: underline;
 }
+ul{
+     list-style-type: none;
+}
+
+/* Style for the container */
+.dropdown {
+    position: relative; /* This is crucial. It positions the dropdown content relative to this container. */
+    display: inline-block; /* Allows buttons to stay on the same line. */
+}
+
+/* Style for the dropdown content (the list) */
+.dropdown-content {
+    display: none; /* Hides the list by default */
+    position: absolute; /* Positions the list absolutely, so it doesn't affect the layout of other elements. */
+    background-color: #f9f9f9;
+    min-width: 160px;
+    top: 100%;
+    left: -50px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1; /* Ensures the dropdown appears on top of other elements. */
+    list-style-type: none; /* Removes bullets */
+    padding: 10px;
+    margin: 0;
+}
+
+/* This is the key: Show the dropdown-content when the user hovers over the dropdown container */
+.dropdown:hover .dropdown-content {
+    display: block; /* Shows the list */
+}
+
+/* Optional: Add a simple style for the list items */
+.dropdown-content li {
+    padding: 8px 16px;
+    text-decoration: none;
+    display: block;
+    color: #333;
+}
 header h1{
 
     display: flex;

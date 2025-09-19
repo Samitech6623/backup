@@ -14,3 +14,6 @@ class ClassesPage(TemplateView):
 
 class ContactPage(TemplateView):
     template_name = 'contact.html'
+
+class AdmissionPage(TemplateView):
+    template_name = 'admission.html'
