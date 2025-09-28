@@ -1,11 +1,13 @@
 /* FAQ Styles */
-
+.container{
+    padding: 20px 100px;
+}
 .faq-section {
     margin-top: 2rem;
 }
 
 .faq-item {
-    margin-bottom: 1rem;
+    margin: 2rem 0rem;
     border: 1px solid #ddd;
     border-radius: 8px;
     overflow: hidden;
@@ -26,9 +28,11 @@
     transition: background-color 0.3s ease;
 }
 
-.faq-question:hover,
+.faq-question:hover{
+    opacity: 0.7;
+}
 .faq-question.active {
-    background-color: #ffa733;
+    background-color: #9b5e0e;
 }
 
 .faq-answer {

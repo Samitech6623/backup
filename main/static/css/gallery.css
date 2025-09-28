@@ -1,27 +1,174 @@
-/* GALLERY STYLES */
+/* ======================
+   🌈 Color Variables (optional)
+   ====================== */
+:root {
+  --main-orange: #ff7b00;
+  --light-orange: #fff0d1;
+  --pale-yellow: #ffebcc;
+  --text-dark: #333;
+  --text-light: #555;
+}
 
-.gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
+/* ======================
+   🎨 Base Styles
+   ====================== */
+
+a {
+  text-decoration: none;
+}
+
+/* ======================
+   🖼️ Gallery Header
+   ====================== */
+.gallery-header {
+  padding: 40px 20px 10px;
+  background-color: var(--pale-yellow);
+  text-align: center;
+}
+
+.gallery-header h1 {
+  font-size: 2.5rem;
+  color: var(--main-orange);
+  margin-bottom: 10px;
+}
+
+.gallery-header p {
+  font-size: 1.1rem;
+  color: var(--text-light);
+}
+
+/* ======================
+   🧩 Filter Buttons
+   ====================== */
+.gallery-filters {
+  text-align: center;
+  margin: 30px 0 20px;
+}
+
+.filter-button {
+  background-color: var(--light-orange);
+  border: 2px solid var(--main-orange);
+  color: var(--main-orange);
+  padding: 10px 15px;
+  margin: 5px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.filter-button.active,
+.filter-button:hover {
+  background-color: var(--main-orange);
+  color: #fff;
+}
+
+/* ======================
+   🖼️ Gallery Grid
+   ====================== */
+.gallery {
+  padding: 40px 20px;
+}
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
 .gallery-item {
-    overflow: hidden;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
-.gallery-item:hover {
-    transform: scale(1.02);
+.gallery-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  cursor: pointer;
 }
 
-.gallery-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    border-radius: 10px;
+.gallery-item figcaption {
+  padding: 10px;
+  background: var(--light-orange);
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  text-align: center;
+}
+
+/* ======================
+   🔍 Lightbox Styles
+   ====================== */
+.lightbox-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.lightbox-overlay img {
+  max-width: 90%;
+  max-height: 80%;
+  border-radius: 8px;
+  box-shadow: 0 0 20px #000;
+}
+
+.close-lightbox {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  font-size: 40px;
+  color: white;
+  cursor: pointer;
+}
+
+/* ======================
+   📢 Call to Action
+   ====================== */
+.gallery-cta {
+  padding: 30px 20px;
+  margin-top: 40px;
+  text-align: center;
+}
+
+.cta-button {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: var(--main-orange);
+  color: #fff;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+  background-color: #e86800;
+}
+
+/* ======================
+   📱 Responsive Tweaks
+   ====================== */
+@media (max-width: 600px) {
+  .gallery-header h1 {
+    font-size: 2rem;
+  }
+
+  .gallery-header p {
+    font-size: 1rem;
+  }
+
+  .cta-button {
+    font-size: 0.95rem;
+    padding: 8px 16px;
+  }
 }

@@ -1,51 +1,67 @@
-/* EVENTS LIST */
-
-.events-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    margin-top: 30px;
+.events-header {
+  padding: 40px 20px 10px;
+  background-color: #ffebcc;
+  text-align: center;
 }
 
-.event-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 20px;
-    padding: 20px;
-    background-color: #f8f8f8;
-    border-left: 6px solid #ffb347;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+.events-header h1 {
+  font-size: 2.5rem;
+  color: #ff7b00;
+  margin-bottom: 10px;
+}
+
+.events-header p {
+  font-size: 1.1rem;
+  color: #555;
+}
+
+.events-list {
+  padding: 40px 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.events-list h2 {
+  color: #ff7b00;
+  margin-bottom: 20px;
+}
+
+.events-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.events-list li {
+  display: flex;
+  align-items: flex-start;
+  background-color: #fff;
+  border-left: 6px solid #ff7b00;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .event-date {
-    text-align: center;
-    background-color: #ffb347;
-    color: white;
-    padding: 10px;
-    border-radius: 8px;
-    min-width: 60px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #ff7b00;
+  min-width: 70px;
+  margin-right: 15px;
 }
 
-.event-day {
-    font-size: 1.5rem;
-    font-weight: bold;
-    display: block;
+.event-info h3 {
+  margin: 0 0 5px;
+  font-size: 1.2rem;
 }
 
-.event-month {
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+.event-info p {
+  margin: 0;
+  color: #555;
 }
 
-.event-title {
-    margin: 0;
-    font-size: 1.25rem;
-    color: #2a7d62;
-}
-
-.event-description {
-    margin: 5px 0 0;
-    color: #555;
+.calendar-download {
+  text-align: center;
+  padding: 20px;
+  margin: 40px 0;
 }

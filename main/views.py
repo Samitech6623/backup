@@ -17,3 +17,14 @@ class ContactPage(TemplateView):
 
 class AdmissionPage(TemplateView):
     template_name = 'admission.html'
+
+class Faqs(TemplateView):
+    template_name = 'FAQs.html'
+
+class Gallery(TemplateView):
+    template_name = 'gallery.html'
+
+class Events(TemplateView):
+    template_name = 'events.html'
+class PortalSelection(TemplateView):
+    template_name = 'portal_selection.html'

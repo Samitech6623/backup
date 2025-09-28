@@ -26,12 +26,12 @@
         <a href="" class="dropbtn">More</a>
         <ul class="dropdown-content">
                <li><a href="{% url 'admission' %}">Admission</a></li>
-               <li><a href="">Gallery</a></li>
-               <li><a href="">Calendar & Events</a></li>
-               <li><a href="">FAQs</a></li>
+               <li><a href="{% url 'gallery' %}">Gallery</a></li>
+               <li><a href="{% url 'events' %}">Calendar & Events</a></li>
+               <li><a href="{% url 'FAQs' %}">FAQs</a></li>
             </ul>
              </div>
-            <a href=""><button class="register-button">Portal</button></a>
+            <a href="{% url 'portal_selection' %}"><button class="register-button">Portal</button></a>
         </nav>
     </header>
 
