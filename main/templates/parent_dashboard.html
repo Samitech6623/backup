@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block head %}
+{% block title %}<title>Parent Dashboard</title>{% endblock %}
+<link rel="stylesheet" href="{% static 'css/parent_dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2>Parent</h2>
+        <ul>
+            <li><a href="#">🏠 Dashboard</a></li>
+            <li><a href="#">👨‍🎓 My Child</a></li>
+            <li><a href="#">📊 Performance</a></li>
+            <li><a href="#">💰 Fees</a></li>
+            <li><a href="#">📅 Events</a></li>
+            <li><a href="#">📩 Messages</a></li>
+            <li><a href="{% url 'portal_logout' %}">🚪 Logout</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1>Welcome, {{ request.user.username|title }}</h1>
+        <p>Role: Parent</p>
+
+        <!-- Dashboard Cards -->
+        <div class="cards">
+            <div class="card">
+                <h3>Child: John Doe</h3>
+                <p>Grade 6</p>
+            </div>
+            <div class="card">
+                <h3>Attendance</h3>
+                <p>95%</p>
+            </div>
+            <div class="card">
+                <h3>Latest Exam</h3>
+                <p>Score: 420/500</p>
+            </div>
+            <div class="card">
+                <h3>Fees Balance</h3>
+                <p>$250</p>
+            </div>
+        </div>
+
+        <!-- Performance Table -->
+        <div class="table-section">
+            <h2>Recent Exam Results</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Score</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Mathematics</td>
+                        <td>88</td>
+                        <td>A</td>
+                    </tr>
+                    <tr>
+                        <td>English</td>
+                        <td>76</td>
+                        <td>B+</td>
+                    </tr>
+                    <tr>
+                        <td>Science</td>
+                        <td>91</td>
+                        <td>A</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Events -->
+        <div class="table-section" style="margin-top:20px;">
+            <h2>Upcoming Events</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Event</th>
+                        <th>Location</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>10 Oct 2025</td>
+                        <td>Parents Meeting</td>
+                        <td>Main Hall</td>
+                    </tr>
+                    <tr>
+                        <td>20 Oct 2025</td>
+                        <td>Sports Day</td>
+                        <td>School Field</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+{% endblock %}

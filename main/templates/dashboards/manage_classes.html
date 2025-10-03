@@ -1,0 +1,110 @@
+{% extends 'base_management_dashboard.html' %}
+
+{% block main_content %}
+<style>
+    .container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.page-title {
+    font-size: 22px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    color: #333;
+}
+
+.actions {
+    margin-bottom: 15px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.data-table th {
+    background: #f5f5f5;
+}
+
+.btn {
+    padding: 6px 12px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-right: 5px;
+}
+
+.btn.add {
+    background: #28a745;
+    color: white;
+}
+
+.btn.edit {
+    background: #007bff;
+    color: white;
+}
+
+.btn.danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.85;
+}
+
+.empty {
+    font-style: italic;
+    color: #666;
+}
+
+</style>
+<div class="container">
+    <h2 class="page-title">📚 Manage Classes</h2>
+
+    <!-- Add Class Button -->
+    <div class="actions">
+        <a href="{% url 'class_add' %}" class="btn add">➕ Add New Class</a>
+    </div>
+
+    <!-- Classes Table -->
+    {% if classes %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Class Name</th>
+                <th>Description</th>
+                <th>Teacher</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for class in classes %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ class.name }}</td>
+                <td>{{ class.teacher.teacher_name }}</td>
+                <td>{{ class.description|default:"-" }}</td>
+                <td>
+                    <a href="{% url 'class_edit' class.id %}" class="btn edit">✏️ Edit</a>
+                    <a href="{% url 'class_delete' class.id %}" class="btn danger">🗑 Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p class="empty">No classes available yet. Click <strong>Add New Class</strong> to create one.</p>
+    {% endif %}
+</div>
+{% endblock %}

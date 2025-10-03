@@ -1,0 +1,122 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+{% block title %}<title>Teacher Dashboard</title>{% endblock %}
+<link rel="stylesheet" href="{% static 'css/teacher_dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2>Teacher</h2>
+        <ul>
+            <li><a href="#">🏠 Dashboard</a></li>
+            <li><a href="#">📚 My Classes</a></li>
+            <li><a href="#">👨‍🎓 Students</a></li>
+            <li><a href="#">📝 Assignments</a></li>
+            <li><a href="#">📊 Grades</a></li>
+            <li><a href="#">📩 Messages</a></li>
+            <li><a href="{% url 'portal_logout' %}">🚪 Logout</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <h1>Welcome, {{ request.user.username|title }}</h1>
+        <p>Role: Teacher</p>
+
+        <!-- Dashboard Cards -->
+        <div class="cards">
+            <div class="card">
+                <h3>Total Classes</h3>
+                <p>4</p>
+            </div>
+            <div class="card">
+                <h3>Total Students</h3>
+                <p>120</p>
+            </div>
+            <div class="card">
+                <h3>Assignments Due</h3>
+                <p>8</p>
+            </div>
+            <div class="card">
+                <h3>Pending Grades</h3>
+                <p>15</p>
+            </div>
+        </div>
+
+        <!-- Students Table -->
+        <div class="table-section">
+            <h2>My Classes</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Class</th>
+                        <th>Students</th>
+                        <th>Subject</th>
+                        <th>Next Lesson</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Grade 6A</td>
+                        <td>30</td>
+                        <td>Mathematics</td>
+                        <td>02 Oct 2025</td>
+                    </tr>
+                    <tr>
+                        <td>Grade 6B</td>
+                        <td>28</td>
+                        <td>Science</td>
+                        <td>03 Oct 2025</td>
+                    </tr>
+                    <tr>
+                        <td>Grade 7</td>
+                        <td>32</td>
+                        <td>English</td>
+                        <td>04 Oct 2025</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Assignments -->
+        <div class="table-section" style="margin-top:20px;">
+            <h2>Upcoming Assignments</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Assignment</th>
+                        <th>Class</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Algebra Worksheet</td>
+                        <td>Grade 6A</td>
+                        <td>05 Oct 2025</td>
+                        <td>Pending</td>
+                    </tr>
+                    <tr>
+                        <td>Science Project</td>
+                        <td>Grade 6B</td>
+                        <td>07 Oct 2025</td>
+                        <td>Pending</td>
+                    </tr>
+                    <tr>
+                        <td>Essay Writing</td>
+                        <td>Grade 7</td>
+                        <td>08 Oct 2025</td>
+                        <td>Assigned</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+{% endblock %}

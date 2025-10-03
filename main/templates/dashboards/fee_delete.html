@@ -1,0 +1,85 @@
+{% extends 'base_management_dashboard.html' %}
+{% block main_content %}
+
+<style>
+/* Delete card */
+.delete-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 25px;
+    margin-top: 30px;
+    max-width: 600px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+.delete-card h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #e74c3c;
+    margin-bottom: 15px;
+}
+
+.delete-card p {
+    font-size: 16px;
+    color: #34495e;
+    margin-bottom: 25px;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    margin: 0 5px;
+}
+
+/* Danger button */
+.btn.danger {
+    background: #e74c3c;
+    color: #fff;
+}
+
+.btn.danger:hover {
+    background: #c0392b;
+}
+
+/* Cancel button */
+.btn.cancel {
+    background: #ecf0f1;
+    color: #333;
+}
+
+.btn.cancel:hover {
+    background: #bdc3c7;
+}
+</style>
+
+<div class="dashboard-content">
+    <div class="delete-card">
+        <h2>🗑 Delete Fee {{type}}</h2>
+
+        {% if type == 'structure' %}
+
+        <p>Are you sure you want to delete the fee structure for
+           <strong>{{ object.class_name }} Term: {{ object.term }} Year:{{ object.year }}</strong>?</p>
+
+           {% elif type == 'payment' %}
+
+           <p>Are you sure you want to delete the fee payment
+           <strong> Receipt No:{{ object.receipt_number }} Student: {{ object.student.first_name }} Amount:{{ object.amount }}</strong>?</p> 
+
+           {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn danger">Yes, Delete</button>
+            <a href="{% url 'manage_financials' %}" class="btn cancel">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

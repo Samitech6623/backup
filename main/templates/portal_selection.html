@@ -34,6 +34,7 @@
 
   <div class="container text-center">
     <h1 class="mb-4" style="color: brown;">Welcome to Kindergarten Portal</h1>
+    <p>Logged in as: {{ user.username }} ({{ user_role }})</p>
     <p class="text-light mb-5">Choose your role to continue</p>
 
     <div class="row justify-content-center">
@@ -41,8 +42,17 @@
       <div class="col-md-3 mb-3">
         <div class="card p-4">
           <h3>Parent</h3>
-          <p>Access your child’s progress, fees, and attendance.</p>
-          <a href="" class="btn btn-primary btn-custom">Login as Parent</a>
+          <p>Access your child's progress, fees, and attendance.</p>
+
+    {% if user.is_authenticated and user_role == 'parent' %}
+
+             <a href="{% url 'parent_dashboard' %}" class="btn btn-success btn-custom">Login as Parent</a>
+
+          {% else %}
+
+          <a href="{% url 'parent_portal' %}" class="btn btn-primary btn-custom">Login as Parent</a>
+
+          {% endif %}
         </div>
       </div>
 
@@ -51,7 +61,16 @@
         <div class="card p-4">
           <h3>Teacher</h3>
           <p>Manage classes, upload reports, and assignments.</p>
-          <a href="" class="btn btn-success btn-custom">Login as Teacher</a>
+
+    {% if user.is_authenticated and user_role == 'teacher' %}
+
+          <a href="{% url 'teacher_dashboard' %}" class="btn btn-success btn-custom">Login as Teacher</a>
+
+          {% else %}
+
+          <a href="{% url 'teacher_portal' %}" class="btn btn-success btn-custom">Login as Teacher</a>
+
+          {% endif %}
         </div>
       </div>
 
@@ -59,8 +78,17 @@
       <div class="col-md-3 mb-3">
         <div class="card p-4">
           <h3>Admin</h3>
-          <p>Manage users, fees, and overall school operations.</p>
-          <a href="" class="btn btn-danger btn-custom">Login as Admin</a>
+          <p>Manage users, fees, and overall school operations.</p> 
+
+    {% if user.is_authenticated and user_role == 'management' %}
+
+          <a href="{% url 'management_dashboard' %}" class="btn btn-success btn-custom">Login as Admin</a>
+
+          {% else %}
+
+          <a href="{% url 'management_portal' %}" class="btn btn-danger btn-custom">Login as Admin</a>
+
+          {% endif %}
         </div>
       </div>
     </div>
