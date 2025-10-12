@@ -19,15 +19,15 @@
             <li><a href="{% url 'manage_classes' %}">📚 Manage Classes</a></li>
             <li><a href="{% url 'manage_events' %}">📅 Manage Events</a></li>
             <li><a href="{% url 'manage_announcements' %}">📢 Manage Announcements</a></li>
-            <li><a href="{% url 'home' %}">📊 Reports</a></li>
+            <li><a href="{% url 'reports_portal' %}">📊 Reports</a></li>
             <li><a href="{% url 'manage_financials' %}">💰 Finances</a></li>
-            <li><a href="{% url 'home' %}">⚙ Settings</a></li>
+            <li><a href="{% url 'settings_page' %}">⚙ Settings</a></li>
             <li><a href="{% url 'portal_logout' %}">🚪 Logout</a></li>
         </ul>
     </aside>
 
     <!-- Main Content -->
-    <main class="main-content">
+    <div class="main-content">
       {% block main_content %}
         <h1>Welcome, {{ request.user.username|title }}</h1>
         <p>Role: Management</p>
@@ -84,6 +84,6 @@
             </table>
         </div>
         {% endblock %}
-    </main>
+    </div>
 </div>
 {% endblock %}

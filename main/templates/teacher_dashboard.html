@@ -13,38 +13,45 @@
     <aside class="sidebar">
         <h2>Teacher</h2>
         <ul>
-            <li><a href="#">🏠 Dashboard</a></li>
-            <li><a href="#">📚 My Classes</a></li>
-            <li><a href="#">👨‍🎓 Students</a></li>
-            <li><a href="#">📝 Assignments</a></li>
-            <li><a href="#">📊 Grades</a></li>
-            <li><a href="#">📩 Messages</a></li>
+            <li><a href="{% url 'teacher_dashboard' %}">🏠 Dashboard</a></li>
+            <li><a href="{% url 'teacher_my_classes' %}">📚 My Classes</a></li>
+            <li><a href="{% url 'teacher_students' %}">👨‍🎓 Students</a></li>
+            <li><a href="{% url 'page_not_available' %}">📝 Assignments</a></li>
+            <li><a href="{% url 'teacher_students_grades_view' %}">📊 Grades</a></li>
+            <li><a href="{% url 'page_not_available' %}">📩 Messages</a></li>
             <li><a href="{% url 'portal_logout' %}">🚪 Logout</a></li>
         </ul>
     </aside>
 
+    <div class="main-content">
     <!-- Main Content -->
-    <main class="main-content">
-        <h1>Welcome, {{ request.user.username|title }}</h1>
+     {% block mainContent %}
+        <h1>Welcome, {{ user.teacher.teacher_name|title }}</h1>
         <p>Role: Teacher</p>
+        <p>Class Teacher: {{class_teacher_of}}</p>
+
 
         <!-- Dashboard Cards -->
-        <div class="cards">
+<div class="cards">
+             
             <div class="card">
-                <h3>Total Classes</h3>
-                <p>4</p>
+                <h3>Total Students (My Class)</h3>
+                <p>{{total_students_my_class}}</p> 
             </div>
+            
             <div class="card">
-                <h3>Total Students</h3>
-                <p>120</p>
+                <h3>Total Subjects Assigned</h3>
+                <p>{{total_subjects_assigned}}</p> 
             </div>
+            
             <div class="card">
-                <h3>Assignments Due</h3>
-                <p>8</p>
+                <h3>Total Students (Assigned Subjects)</h3>
+                <p>{{total_students_subjects_assigned}}</p>
             </div>
+
             <div class="card">
                 <h3>Pending Grades</h3>
-                <p>15</p>
+                <p>{{pending_grades}}</p>
             </div>
         </div>
 
@@ -61,29 +68,22 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Grade 6A</td>
-                        <td>30</td>
-                        <td>Mathematics</td>
-                        <td>02 Oct 2025</td>
-                    </tr>
-                    <tr>
-                        <td>Grade 6B</td>
-                        <td>28</td>
-                        <td>Science</td>
-                        <td>03 Oct 2025</td>
-                    </tr>
-                    <tr>
-                        <td>Grade 7</td>
-                        <td>32</td>
-                        <td>English</td>
-                        <td>04 Oct 2025</td>
-                    </tr>
+                  
+                    {% for class in classes_assigned %}
+                            <tr>
+                <td>{{ class.class_assigned }}</td>
+                <td>{{ class.class_assigned.total_class_students }}</td>
+                <td>{{ class.subject }}</td>
+                <td>N/A</td>
+                        </tr>
+                    {% endfor %}
+
+                   
                 </tbody>
             </table>
         </div>
 
-        <!-- Assignments -->
+        <!-- Assignments 
         <div class="table-section" style="margin-top:20px;">
             <h2>Upcoming Assignments</h2>
             <table>
@@ -117,6 +117,8 @@
                 </tbody>
             </table>
         </div>
-    </main>
+    -->
+    {% endblock %}
+    </div>
 </div>
 {% endblock %}

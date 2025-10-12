@@ -80,12 +80,12 @@
 
 </style>
 <div class="form-card">
-    <h2>{{ action }} Class</h2>
+    <h2>{{ action }} {{type_name}}</h2>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn save">💾 Save</button>
-        <a href="{% url 'manage_classes' %}" class="btn cancel">Cancel</a>
+        <a href="{% url go_to_url %}" class="btn cancel">Cancel</a>
     </form>
 </div>
 {% endblock %}

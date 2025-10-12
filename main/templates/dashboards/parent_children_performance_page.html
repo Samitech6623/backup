@@ -1,0 +1,87 @@
+{% extends 'parent_dashboard.html' %}
+
+{% block main_content %}
+<style>
+    .performance-container {
+    padding: 30px;
+    background: #f4f6f9;
+}
+
+.performance-container h1 {
+    margin-bottom: 20px;
+    font-size: 28px;
+    color: #1565c0;
+}
+
+.child-performance {
+    background: #fff;
+    margin-bottom: 30px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.child-performance h2 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.results-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.results-table th, .results-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+}
+
+.results-table th {
+    background: #1565c0;
+    color: white;
+}
+
+</style>
+<div class="performance-container">
+    <h1>📊 Performance Overview</h1>
+    <p>Here’s how your children are performing in their studies.</p>
+
+    {% for child in children %}
+    <div class="child-performance">
+        <h2>{{ child.display_name }} - {{ child.current_class }}</h2>
+        <p><strong>Admission No:</strong> {{ child.admission_number }}</p>
+
+        <div class="results-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Score</th>
+                        <th>Grade</th>
+                        <th>Term</th>
+                        <th>Year</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in child.results.all %}
+                    <tr>
+                        <td>{{ result.subject }}</td>
+                        <td>{{ result.score }}</td>
+                        <td>{{ result.grade }}</td>
+                        <td>{{ result.term }}</td>
+                        <td>{{ result.year }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5">No results available</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% empty %}
+    <p>No performance records found for your children.</p>
+    {% endfor %}
+</div>
+{% endblock %}

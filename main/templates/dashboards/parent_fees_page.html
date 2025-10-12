@@ -1,0 +1,128 @@
+{% extends "parent_dashboard.html" %}
+
+{% block main_content %}
+<div class="container">
+    <h2 class="page-title">Fees Status - Term {{ term }}, {{ year }}</h2>
+
+    <!-- Fees Summary -->
+    <table class="fees-table">
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Admission No</th>
+                <th>Class</th>
+                <th>Total Paid</th>
+                <th>Balance</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in students_data %}
+            <tr>
+                <td>{{ data.student.display_name }}</td>
+                <td>{{ data.student.admission_number }}</td>
+                <td>{{ data.student.current_class.name }}</td>
+                <td>Ksh {{ data.total_paid|floatformat:2 }}</td>
+                <td>
+                    {% if data.balance > 0 %}
+                        <span class="balance-due">Ksh {{ data.balance|floatformat:2 }}</span>
+                    {% else %}
+                        <span class="balance-cleared">Cleared</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No student fee records available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Payment Statements -->
+    <div class="statements">
+        <h3>Payment Statements</h3>
+        {% for data in students_data %}
+            <div class="student-payments">
+                <h4>{{ data.student.display_name }} ({{ data.student.admission_number }})</h4>
+                <table class="statement-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Method</th>
+                            <th>Reference</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in data.payments %}
+                            <tr>
+                                <td>{{ payment.paid_on|date:"M d, Y" }}</td>
+                                <td>Ksh {{ payment.amount|floatformat:2 }}</td>
+                                <td>{{ payment.status }}</td>
+                                <td>{{ payment.payment_method }}</td>
+                                <td>{{ payment.receipt_number }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5">No payments recorded yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.container {
+    margin: 30px auto;
+    max-width: 1000px;
+}
+.page-title {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+.fees-table, .statement-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+}
+.fees-table th, .fees-table td,
+.statement-table th, .statement-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+.fees-table th, .statement-table th {
+    background: #3498db;
+    color: #fff;
+    font-weight: bold;
+}
+.balance-due {
+    color: red;
+    font-weight: bold;
+}
+.balance-cleared {
+    color: green;
+    font-weight: bold;
+}
+.statements h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+.student-payments {
+    margin-bottom: 40px;
+}
+.student-payments h4 {
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+</style>
+{% endblock %}

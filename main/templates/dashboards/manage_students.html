@@ -15,6 +15,8 @@
             <th>Last Name</th>
             <th>Admission Number</th>
             <th>Class</th>
+            <th>Actions</th>
+
         </tr>
     </thead>
     <tbody>
@@ -25,6 +27,7 @@
             <td>{{ student.admission_number }}</td>
             <td>{{ student.current_class }}</td>
             <td class="actions">
+                <a href="{% url 'management_student_detail' student.id %}" class="btn btn-details">Details</a>
                 <a href="{% url 'edit_student' student.id %}" class="btn btn-edit">✏ Edit</a>
                 <a href="{% url 'delete_student' student.id %}" class="btn btn-delete">❌ Delete</a>
             </td>
@@ -83,6 +86,14 @@
 }
 .btn-delete:hover {
     background: #b02a37;
+}
+
+.btn-details {
+    background: #9e6c20;
+    color: #fff;
+}
+.btn-details:hover {
+    background: #7c5924;
 }
 
 /* Table */

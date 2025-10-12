@@ -1,0 +1,116 @@
+{% extends "teacher_dashboard.html" %}
+
+{% block mainContent %}
+<style>
+.container {
+  max-width: 900px;
+  margin: 2rem auto;
+  font-family: "Poppins", sans-serif;
+}
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+.table th, .table td {
+  padding: 0.6rem;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+.table th {
+  background: #f2f2f2;
+}
+h3, h5 {
+  color: #333;
+}
+.btn {
+  background: #0066cc;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn:hover {
+  background: #004d99;
+}
+.btn-secondary {
+  background: #777;
+}
+.btn-secondary:hover {
+  background: #555;
+}
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+</style>
+
+<div class="container">
+  <h3>📘 Students Grades</h3>
+
+  <div class="card">
+    <form method="get">
+      <h5>Select Exam and Class</h5>
+      {{ selection_form.as_p }}
+      <button type="submit" class="btn">View Grades</button>
+    </form>
+  </div>
+
+  {% if selected_class %}
+  <div class="top-bar">
+    <h5>Class: {{ selected_class.name }}</h5>
+    <a href="{% url 'teacher_students_grades_edit' %}?{{ request.GET.urlencode }}" class="btn">✏️ Edit Grades</a>
+  </div>
+
+  {% if own_class_results %}
+  <div class="card">
+    <h5>My Class Results</h5>
+    <table class="table">
+      <thead>
+        <tr><th>Student</th><th>Subject</th><th>Score</th><th>Grade</th></tr>
+      </thead>
+      <tbody>
+        {% for r in own_class_results %}
+        <tr>
+          <td>{{ r.student }}</td>
+          <td>{{ r.subject }}</td>
+          <td>{{ r.score }}</td>
+          <td>{{ r.grade }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% elif other_class_results %}
+  <div class="card">
+    <h5>Other Class Results</h5>
+    <table class="table">
+      <thead>
+        <tr><th>Student</th><th>Subject</th><th>Score</th><th>Grade</th></tr>
+      </thead>
+      <tbody>
+        {% for r in other_class_results %}
+        <tr>
+          <td>{{ r.student }}</td>
+          <td>{{ r.subject }}</td>
+          <td>{{ r.score }}</td>
+          <td>{{ r.grade }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

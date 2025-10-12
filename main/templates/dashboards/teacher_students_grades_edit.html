@@ -1,0 +1,171 @@
+{% extends "teacher_dashboard.html" %}
+
+{% block mainContent %}
+<style>
+.container {
+  max-width: 900px;
+  margin: 2rem auto;
+  font-family: "Poppins", sans-serif;
+}
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom: 1.5rem;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+.table th, .table td {
+  padding: 0.6rem;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+.table th {
+  background: #f2f2f2;
+}
+.table input {
+  width: 90%;
+  padding: 0.3rem;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  text-align: center;
+}
+h3, h5 {
+  color: #333;
+}
+.btn {
+  background: #0066cc;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn:hover {
+  background: #004d99;
+}
+.btn-secondary {
+  background: #777;
+}
+.btn-secondary:hover {
+  background: #555;
+}
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+</style>
+
+<div class="container">
+  <h3>✏️ Edit Grades Inline</h3>
+
+  <div class="card">
+    <form method="get">
+      <h5>Select Exam and Class</h5>
+      {{ selection_form.as_p }}
+      <button type="submit" class="btn">Load Results</button>
+    </form>
+  </div>
+  
+{% comment %} 
+    Display formset errors here for debugging if is_valid() fails 
+{% endcomment %}
+{% if own_class_formset and request.method == "POST" %}
+    {% if own_class_formset.errors %}
+      <div style="color: red; padding: 10px; border: 1px solid red; margin-bottom: 10px;">
+        <p>Formset failed to save. Please check errors below.</p>
+        {{ own_class_formset.non_field_errors }}
+      </div>
+    {% endif %}
+{% endif %}
+  
+{% if own_class_formset %}
+  <form method="post">
+    {% csrf_token %}
+    {{ own_class_formset.management_form }}
+    <div class="card">
+      <table class="table">
+        <thead>
+          <tr><th>Student</th><th>Subject</th><th>Score</th><th>Grade</th></tr>
+        </thead>
+        <tbody>
+          {% for form in own_class_formset %}
+          <tr {% if form.errors %}style="border: 2px solid red;"{% endif %}>
+            
+            {% comment %} 
+              🔑 FIX: Render all hidden fields (including ID, student FK, etc.)
+            {% endcomment %}
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+
+            <td>{{ form.instance.student }}</td>
+            <td>{{ form.instance.subject }}</td>
+            <td>
+              {{ form.score.errors }}
+              {{ form.score }}
+            </td>
+            <td>
+              {{ form.grade.errors }}
+              {{ form.grade }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <button type="submit" class="btn mt-2">💾 Save All</button>
+    </div>
+  </form>
+
+{% elif other_class_formset %}
+  <form method="post">
+    {% csrf_token %}
+    {{ other_class_formset.management_form }}
+    <div class="card">
+      <table class="table">
+        <thead>
+          <tr><th>Student</th><th>Subject</th><th>Score</th><th>Grade</th></tr>
+        </thead>
+        <tbody>
+          {% for form in other_class_formset %}
+          <tr {% if form.errors %}style="border: 2px solid red;"{% endif %}>
+            
+            {% comment %} 
+              🔑 FIX: Render all hidden fields (including ID, student FK, etc.)
+            {% endcomment %}
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+
+            <td>{{ form.instance.student }}</td>
+            <td>{{ form.instance.subject }}</td>
+            <td>
+              {{ form.score.errors }}
+              {{ form.score }}
+            </td>
+            <td>
+              {{ form.grade.errors }}
+              {{ form.grade }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <button type="submit" class="btn mt-2">💾 Save All</button>
+    </div>
+  </form>
+
+{% else %}
+  <div class="card">
+    <p>No results available for this selection.</p>
+  </div>
+{% endif %}
+
+</div>
+{% endblock %}

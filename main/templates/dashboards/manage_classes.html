@@ -93,8 +93,8 @@
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ class.name }}</td>
-                <td>{{ class.teacher.teacher_name }}</td>
                 <td>{{ class.description|default:"-" }}</td>
+                <td>{{ class.class_teacher.teacher_name }}</td>
                 <td>
                     <a href="{% url 'class_edit' class.id %}" class="btn edit">✏️ Edit</a>
                     <a href="{% url 'class_delete' class.id %}" class="btn danger">🗑 Delete</a>
