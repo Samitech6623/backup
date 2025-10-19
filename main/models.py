@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models import Sum,Avg
 from django.contrib.auth.models import User
-
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 # Create your models here.
@@ -27,14 +27,14 @@ class Session(models.Model):
         return (f"{self.term} Year {self.year}")
 
 class Management(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='management_profile')
     is_admin_user = models.BooleanField(default=True)
 
     def __str__(self):
         return  "school admin"
 
 class Parent(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='parent_profile')
     full_name = models.CharField(max_length=100)
     phone = models.CharField(max_length=15)
     email = models.EmailField(unique=True, null=True, blank=True) 
@@ -75,6 +75,8 @@ class Class(models.Model):
     @property
     def total_class_students(self):
         return self.students.count()
+    def class_perfomance_summary(self):
+        return
 
     def __str__(self):
         return self.name
@@ -141,7 +143,7 @@ class Student(models.Model):
         return (f"{self.first_name} {self.last_name} {self.admission_number}") 
     
 class Teacher(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='teacher_profile')
     teacher_name = models.CharField(max_length=100)
     email = models.EmailField(unique=True, null=True, blank=True) 
     phone = models.CharField(max_length=15)
@@ -219,22 +221,28 @@ class Result(models.Model):
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE, related_name="exam_details")
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     score = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-    grade = models.CharField(max_length=2, blank=True)
+    grade_object = models.ForeignKey(
+        'Grade', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name="results_with_this_grade"
+    )    
     remarks = models.TextField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         # Automatically assign grade and remarks based on score
         grade_obj = Grade.objects.filter(min_score__lte=self.score, max_score__gte=self.score).first()
         if grade_obj:
-            self.grade = grade_obj.grade
-            self.remarks = grade_obj.remark
+            self.grade_object = grade_obj
         else:
-            self.grade = "-"
-            self.remarks = "Ungraded"
+            self.grade_object = None
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.student} - {self.subject} ({self.grade})"
+        grade_str = self.grade_object.grade if self.grade_object else "N/A"
+
+        return f"{self.student} - {self.subject} ({grade_str})"
 
 
 
@@ -291,6 +299,22 @@ class Grade(models.Model):
 
     class Meta:
         ordering = ['-min_score']
+
+    def clean(self):
+        """Ensure min_score is less than max_score."""
+        if self.min_score >= self.max_score:
+            raise ValidationError(
+                'min_score must be strictly less than max_score.'
+            )
+        # You could also check for negative values if scores must be non-negative
+        if self.min_score < 0:
+             raise ValidationError('Scores cannot be negative.')
+
+    def save(self, *args, **kwargs):
+        if self.grade:
+            self.grade = self.grade.upper()
+            self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.grade} ({self.min_score}-{self.max_score})"

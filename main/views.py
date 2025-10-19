@@ -1,4 +1,5 @@
 from django.shortcuts import render,redirect,get_object_or_404
+from django.http import HttpResponseRedirect,HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView,ListView,UpdateView,CreateView,DeleteView
@@ -6,18 +7,19 @@ from django.contrib.auth import login,logout
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm,AuthenticationForm,PasswordChangeForm,PasswordResetForm
-from .models import Student,Teacher,Parent,Class,SchoolFeeStructure,FeePayment,Announcement,Event,Result,Subject,Exam, Session
+from .models import Student,Teacher,Parent,Class,SchoolFeeStructure,FeePayment,Announcement,Event,Result,Subject,Exam, Session,Grade
 from django.urls import reverse_lazy
-from django.db.models import Sum,Count
+from django.db.models import Sum,Count,Avg
 from django.utils import timezone
 from django.db import transaction  # Import transaction for robust saving
-
+from .utils import (group_student_results, assign_positions,filter_subjects,class_score_summary,handle_own_class_results,
+                    handle_other_class_results,subject_results_with_ranks,get_fee_summary)
 
 from django.forms import modelformset_factory
 
 
-from .forms import ParentForm, StudentForm, TeacherForm,ClassForm,FeeStructureForm,FeePaymentForm,ExamSelectionForm, ResultForm
-
+from .forms import ParentForm, StudentForm, TeacherForm,ClassForm,FeeStructureForm,FeePaymentForm,ExamSelectionForm, ResultForm,ParentPerformanceFilterForm
+#from weasyprint import HTML
 # Create your views here.
 
 
@@ -144,129 +146,103 @@ def teacher_students(request):
 def teacher_students_grades_view(request):
     teacher = get_object_or_404(Teacher, user=request.user)
     selection_form = ExamSelectionForm(request.GET or None)
-    own_class_results = None
-    other_class_results = None
-    selected_class = None
-    own_class = None
-
-    if selection_form.is_valid():
-        session = selection_form.cleaned_data['session']
-        exam = selection_form.cleaned_data['exam']
-        selected_class = selection_form.cleaned_data['class_selected']
-        students = Student.objects.filter(current_class=selected_class)
-
-        # Identify teacher’s own class
-        try:
-            own_class = Class.objects.get(class_teacher=teacher)
-        except Class.DoesNotExist:
-            own_class = None
-
-        # Subjects taught by this teacher in that class
-        subjects_taught = teacher.subjects_in_class(selected_class)
-
-        if own_class and selected_class == own_class:
-            own_class_results = Result.objects.filter(exam=exam, student__in=students)
-        else:
-            other_class_results = Result.objects.filter(
-                exam=exam,
-                student__in=students,
-                subject__in=subjects_taught
-            )
 
     context = {
         "selection_form": selection_form,
-        "selected_class": selected_class,
-        "own_class_results": own_class_results,
-        "other_class_results": other_class_results,
-        "class_teacher_class": own_class,
+        "own_class_results": [],
+        "other_class_results": [],
+        "selected_class": None,
+        "class_teacher_class": Class.objects.filter(class_teacher=teacher).first(),
+        "class_mean_score":None,
+        "class_mean_grade":None,
+        "class_average":None,
+        "class_subjects_mean":None
     }
-    return render(request, "dashboards/teacher_students_grades_view.html", context)
 
+    if not selection_form.is_valid():
+        return render(request, "dashboards/teacher_students_grades_view.html", context)
+
+    selected_class = selection_form.cleaned_data["class_selected"]
+    exam = selection_form.cleaned_data["exam"]
+    exam_session = selection_form.cleaned_data['session']
+    if exam.exam_session == exam_session:
+        students = Student.objects.filter(current_class=selected_class)
+        subjects_taught = teacher.subjects_in_class(selected_class)
+        results_qs = Result.objects.filter(exam=exam, student__in=students).select_related("student", "subject")
+    
+        grouped_data = group_student_results(results_qs, students)
+        subject_ranked_results = subject_results_with_ranks(grouped_data,subjects_taught)
+        context["subject_ranked_results"] = subject_ranked_results
+        grouped_data = assign_positions(grouped_data)
+        class_summary = class_score_summary(grouped_data,results_qs)
+        context.update({
+            "class_mean_score": class_summary.get("class_mean_score"),
+            "class_average": class_summary.get("class_average"),
+            "class_mean_grade": class_summary.get("class_mean_grade"),
+            "class_subjects_mean": class_summary.get("class_subjects_mean"),
+            "selected_class": selected_class
+        })
+
+
+
+        if context["class_teacher_class"] == selected_class:
+            context["own_class_results"] = grouped_data
+        else:
+            context["other_class_results"] = filter_subjects(grouped_data, subjects_taught)
+    else:
+        messages.error(request,"No exam results associated with the details provided.Please check and try again")
+        return render(request, "dashboards/teacher_students_grades_view.html", context)
+
+    context["selected_class"] = selected_class
+    return render(request, "dashboards/teacher_students_grades_view.html", context)
 
 
 
 @login_required
 def teacher_students_grades_edit(request):
     teacher = get_object_or_404(Teacher, user=request.user)
-    
-    # 🔑 FIX: Set extra=1 to allow adding one new blank result form.
-    # If you need more than one new result, increase the 'extra' value.
-    ExamResultFormSet = modelformset_factory(Result, form=ResultForm, extra=0)
-
     selection_form = ExamSelectionForm(request.GET or None)
-    own_class_formset = None
-    other_class_formset = None
-    selected_class = None
-    own_class = None
+
+    # Initialize context
+    context = {
+        "selection_form": selection_form,
+        "own_class_formset": None,
+        "other_class_formset": None,
+        "selected_class": None,
+        "class_teacher_class": None,
+    }
 
     if selection_form.is_valid():
         exam = selection_form.cleaned_data['exam']
+        exam_session = selection_form.cleaned_data['session']
         selected_class = selection_form.cleaned_data['class_selected']
         students = Student.objects.filter(current_class=selected_class)
 
-        try:
-            own_class = Class.objects.get(class_teacher=teacher)
-        except Class.DoesNotExist:
-            own_class = None
+        own_class = Class.objects.filter(class_teacher=teacher).first()
+        context["selected_class"] = selected_class
+        context["class_teacher_class"] = own_class
 
         subjects_taught = teacher.subjects_in_class(selected_class)
-
-        # Class teacher editing own class results
+ 
+        # ✏️ Handle own class
         if own_class and selected_class == own_class:
-            results = Result.objects.filter(exam=exam, student__in=students)
-
-            # Prepopulate missing results to ensure all students have a row
-            if not results.exists() or results.count() < students.count() * selected_class.subjects.count():
-                for student in students:
-                    for subject in selected_class.subjects.all():
-                        Result.objects.get_or_create(
-                            student=student, subject=subject, exam=exam
-                        )
-                results = Result.objects.filter(exam=exam, student__in=students)
-
-            own_class_formset = ExamResultFormSet(request.POST or None, queryset=results, prefix="own")
-
-            if request.method == "POST" and own_class_formset.is_valid():
-                try:
-                    # 🔑 Added transaction block for atomic saving
-                    with transaction.atomic():
-                        own_class_formset.save()
-                    messages.success(request, "✅ My Class grades saved successfully!")
-                    return redirect("teacher_students_grades_view")
-                except Exception as e:
-                    # Catch and display specific database/save errors
-                    messages.error(request, f"❌ Database Error during save: {e}")
-
-        # Teacher editing subjects they teach in other classes
+            form_response = handle_own_class_results(request, exam, selected_class, students,exam_session)
         else:
-            results = Result.objects.filter(
-                exam=exam,
-                student__in=students,
-                subject__in=subjects_taught
-            )
+            form_response = handle_other_class_results(request, exam, selected_class, students, subjects_taught,exam_session)
 
-            # Pre-populate here as well, if needed for new subjects taught
-            # (Logic for pre-population in other classes is more complex and left out for brevity)
-            
-            other_class_formset = ExamResultFormSet(request.POST or None, queryset=results, prefix="other")
+        # 🔁 If helper returned a redirect, redirect immediately
+        if isinstance(form_response, HttpResponseRedirect):
+            return form_response
 
-            if request.method == "POST" and other_class_formset.is_valid():
-                try:
-                    with transaction.atomic():
-                        other_class_formset.save()
-                    messages.success(request, "✅ Grades for other classes updated successfully!")
-                    return redirect("teacher_students_grades_view")
-                except Exception as e:
-                    messages.error(request, f"❌ Database Error during save: {e}")
+        # Otherwise, set the appropriate formset in context
+        if own_class and selected_class == own_class:
+            context["own_class_formset"] = form_response
+        else:
+            context["other_class_formset"] = form_response
 
-    context = {
-        "selection_form": selection_form,
-        "own_class_formset": own_class_formset,
-        "other_class_formset": other_class_formset,
-        "selected_class": selected_class,
-        "class_teacher_class": own_class,
-    }
     return render(request, "dashboards/teacher_students_grades_edit.html", context)
+
+
 
 
 class page_not_available(TemplateView):
@@ -313,7 +289,118 @@ def parent_dashboard(request):
     }
     return render(request, "parent_dashboard.html", context)
 
+@login_required
+def my_children(request):
+    parent = get_object_or_404(Parent, user=request.user)
+    children = parent.children.all()   # because of related_name="children"
+    return render(request, "dashboards/my_children.html", {"children": children})
 
+
+@login_required
+def parent_child_detail(request, pk):
+    child = get_object_or_404(Student, pk=pk, parent__user=request.user)
+
+    # Example: latest exam results and attendance
+    latest_exam = Result.objects.filter(student=child).order_by('-exam__exam_session__start_date').first()
+    if latest_exam:
+        latest_exam = latest_exam.exam  # The latest Exam object
+        results = Result.objects.filter(student=child, exam=latest_exam)
+    else:
+        results = Result.objects.none()  # no results found
+
+    total_paid = child.total_fees_paid()
+    balance = child.fee_balance(term="Term 1", year=2025)  # you can adjust dynamically
+
+    attendance_rate = getattr(child, "attendance_rate", None)
+
+    return render(
+        request,
+        "dashboards/parent_child_detail.html",
+        {
+            "child": child,
+            "results": results,
+            "latest_exam":latest_exam,
+            "total_paid": total_paid,
+            "balance": balance,
+            "attendance_rate": attendance_rate,
+        },
+    )
+def parent_performance_page(request):
+    form = ParentPerformanceFilterForm(request.GET or None, parent=request.user.parent_profile)
+
+    results = []
+    if form.is_valid():
+        child = form.cleaned_data["child"]
+        exam = form.cleaned_data["exam"]
+        results = Result.objects.filter(student=child, exam=exam).select_related(
+            "subject", "exam__exam_session", "grade_object"
+        )
+
+    return render(request, "dashboards/parent_children_performance_page.html", {
+        "form": form,
+        "results": results
+    })
+
+def parent_download_results(request):
+    child_id = request.GET.get("child_id")
+    exam_id = request.GET.get("exam_id")
+
+    results = Result.objects.filter(student_id=child_id, exam_id=exam_id).select_related("subject", "grade_object", "exam")
+
+    # Render an HTML template for PDF
+    html_string = render(request, "parent/results_pdf.html", {
+        "results": results,
+        "child": results[0].student if results else None,
+        "exam": results[0].exam if results else None,
+    }).content.decode("utf-8")
+
+    # Generate PDF
+    pdf_file = HTML(string=html_string).write_pdf()
+
+    response = HttpResponse(pdf_file, content_type="application/pdf")
+    response['Content-Disposition'] = f'attachment; filename="results_{child_id}_{exam_id}.pdf"'
+
+    return response
+
+@login_required
+def parent_fees_page(request):
+    parent = request.user.parent_profile
+    children = parent.children.select_related("current_class").all()
+
+    # Get current academic session
+    current_session = Session.objects.order_by("-year", "-term").first()
+    term = current_session.term if current_session else "Term 1"
+    year = current_session.year if current_session else timezone.now().year
+
+    fees_data = []
+
+    for student in children:
+        # ✅ Use helper to calculate fee summary
+        fee_summary = get_fee_summary(student, term, year)
+
+        payments = student.fee_payment.all().order_by("-paid_on")
+
+        fees_data.append({
+            "student": student,
+            "class": student.current_class,
+            "term": term,
+            "year": year,
+            "amount_required": fee_summary["required"],
+            "total_paid": fee_summary["paid"],
+            "balance": fee_summary["balance"],
+            "status": fee_summary["status"],
+            "payments": payments,
+        })
+
+    context = {
+        "current_session": current_session,
+        "fees_data": fees_data,
+        "term": term,
+        "year": year,
+        "session": current_session,
+    }
+
+    return render(request, "dashboards/parent_fees_page.html", context)
 
 class AboutPage(TemplateView):
     template_name = 'about.html'
@@ -634,35 +721,6 @@ def reports_portal(request):
     return render(request, "dashboards/manage_reports.html", context)
 
 
-@login_required
-def my_children(request):
-    parent = get_object_or_404(Parent, user=request.user)
-    children = parent.children.all()   # because of related_name="children"
-    return render(request, "dashboards/my_children.html", {"children": children})
-
-
-@login_required
-def parent_child_detail(request, pk):
-    child = get_object_or_404(Student, pk=pk, parent__user=request.user)
-
-    # Example: latest exam results and attendance
-    results = child.results.all().order_by("-id")[:10]  # last 10 results
-    total_paid = child.total_fees_paid()
-    balance = child.fee_balance(term="Term 1", year=2025)  # you can adjust dynamically
-
-    attendance_rate = getattr(child, "attendance_rate", None)
-
-    return render(
-        request,
-        "dashboards/parent_child_detail.html",
-        {
-            "child": child,
-            "results": results,
-            "total_paid": total_paid,
-            "balance": balance,
-            "attendance_rate": attendance_rate,
-        },
-    )
 
 @login_required
 def management_student_detail(request, pk):
@@ -694,59 +752,4 @@ def events_page(request):
     events = Event.objects.all().order_by("date")  # upcoming first
     return render(request, "dashboards/events_page.html", {"events": events})
 
-@login_required
-def performance_page(request):
-    parent = get_object_or_404(Parent, user=request.user)
-    children = parent.children.prefetch_related("results").all()
-    return render(request, "dashboards/parent_children_performance_page.html", {"children": children})
 
-
-@login_required
-def fees_page(request):
-    parent = request.user.parent  # get parent linked to logged-in user
-    children = parent.children.select_related("current_class").all()
-
-    # ✅ get current session info (latest or active)
-    current_session = Session.objects.order_by("-year", "-term").first()
-    term = current_session.term if current_session else "Term 1"
-    year = current_session.year if current_session else timezone.now().year
-
-    fees_data = []
-
-    for student in children:
-        total_paid = student.total_fees_paid()
-        balance = student.fee_balance(term, year)
-        payments = student.fee_payment.all().order_by("-paid_on")
-
-        # find expected fees (if structure exists)
-        fee_structure = SchoolFeeStructure.objects.filter(
-            class_name=student.current_class, term=term, year=year
-        ).first()
-
-        amount_required = fee_structure.amount_required if fee_structure else 0
-        status = (
-            "Cleared ✅" if balance <= 0
-            else "Partially Paid 🟡" if total_paid > 0
-            else "Not Paid 🔴"
-        )
-
-        fees_data.append({
-            "student": student,
-            "class": student.current_class,
-            "term": term,
-            "year": year,
-            "amount_required": amount_required,
-            "total_paid": total_paid,
-            "balance": balance,
-            "status": status,
-            "payments": payments,
-        })
-
-    context = {
-        "current_session":current_session,
-        "fees_data": fees_data,
-        "term": term,
-        "year": year,
-        "session": current_session,
-    }
-    return render(request, "dashboards/parent_fees_page.html", context)

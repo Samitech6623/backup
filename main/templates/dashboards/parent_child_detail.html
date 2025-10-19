@@ -70,12 +70,15 @@
     <!-- Exam Results -->
     <div class="table-section">
         <h2>Recent Exam Results</h2>
+                <h2>{{latest_exam.exam_name}} {{latest_exam.exam_session.term}} {{latest_exam.exam_session.year}}</h2>
         <table>
             <thead>
                 <tr>
                     <th>Subject</th>
                     <th>Score</th>
                     <th>Grade</th>
+                     <th>Remark</th>
+
                 </tr>
             </thead>
             <tbody>
@@ -83,7 +86,8 @@
                 <tr>
                     <td>{{ result.subject }}</td>
                     <td>{{ result.score }}</td>
-                    <td>{{ result.grade }}</td>
+                    <td>{{ result.grade_object.grade }}</td>
+                    <td>{{result.grade_object.remark}}</td>
                 </tr>
                 {% empty %}
                 <tr><td colspan="3">No results available</td></tr>

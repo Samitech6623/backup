@@ -7,41 +7,47 @@
     <!-- Fees Summary -->
     <table class="fees-table">
         <thead>
-            <tr>
-                <th>Student</th>
-                <th>Admission No</th>
-                <th>Class</th>
-                <th>Total Paid</th>
-                <th>Balance</th>
-            </tr>
+    <tr>
+        <th>Student</th>
+        <th>Admission No</th>
+        <th>Class</th>
+        <th>Expected</th>  {# ✅ ADD THIS #}
+        <th>Total Paid</th>
+        <th>Balance</th>
+        <th>Status</th>
+    </tr>
+
         </thead>
-        <tbody>
-            {% for data in students_data %}
-            <tr>
-                <td>{{ data.student.display_name }}</td>
-                <td>{{ data.student.admission_number }}</td>
-                <td>{{ data.student.current_class.name }}</td>
-                <td>Ksh {{ data.total_paid|floatformat:2 }}</td>
-                <td>
-                    {% if data.balance > 0 %}
-                        <span class="balance-due">Ksh {{ data.balance|floatformat:2 }}</span>
-                    {% else %}
-                        <span class="balance-cleared">Cleared</span>
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5">No student fee records available.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
+       <tbody>
+    {% for data in fees_data %}
+    <tr>
+        <td>{{ data.student.display_name }}</td>
+        <td>{{ data.student.admission_number }}</td>
+        <td>{{ data.class.name }}</td>
+        <td>Ksh {{ data.amount_required|floatformat:2 }}</td>  {# ✅ ADD THIS #}
+        <td>Ksh {{ data.total_paid|floatformat:2 }}</td>
+        <td>
+            {% if data.balance > 0 %}
+                <span class="balance-due">Ksh {{ data.balance|floatformat:2 }}</span>
+            {% else %}
+                <span class="balance-cleared">Cleared</span>
+            {% endif %}
+        </td>
+        <td>{{ data.status }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="7">No student fee records available.</td>
+    </tr>
+    {% endfor %}
+</tbody>
+
     </table>
 
     <!-- Payment Statements -->
     <div class="statements">
         <h3>Payment Statements</h3>
-        {% for data in students_data %}
+        {% for data in fees_data %}
             <div class="student-payments">
                 <h4>{{ data.student.display_name }} ({{ data.student.admission_number }})</h4>
                 <table class="statement-table">
@@ -60,7 +66,7 @@
                                 <td>{{ payment.paid_on|date:"M d, Y" }}</td>
                                 <td>Ksh {{ payment.amount|floatformat:2 }}</td>
                                 <td>{{ payment.status }}</td>
-                                <td>{{ payment.payment_method }}</td>
+                                <td>{{ payment.get_payment_method_display }}</td>
                                 <td>{{ payment.receipt_number }}</td>
                             </tr>
                         {% empty %}

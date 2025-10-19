@@ -1,6 +1,6 @@
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from .models import Parent, Student, Teacher,Class,User,SchoolFeeStructure,FeePayment, Announcement, Event,Session, Exam, Result
+from .models import Parent, Student, Teacher,Class,User,SchoolFeeStructure,FeePayment, Announcement, Event,Session, Exam, Result,Grade
 
 
 class UserForm(UserCreationForm):
@@ -101,13 +101,26 @@ class ExamSelectionForm(forms.Form):
 class ResultForm(forms.ModelForm):
     class Meta:
         model = Result
-        fields = ['student', 'subject', 'score', 'grade', 'remarks']
+        fields = ['student', 'subject', 'score', 'remarks']
         
         widgets = {
             'student': forms.HiddenInput(),
             'subject': forms.HiddenInput(),
             'score': forms.NumberInput(attrs={'class': 'form-control'}),
-            'grade': forms.TextInput(attrs={'class': 'form-control'}),
             'remarks': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}),
         }
 
+class GradeForm(forms.ModelForm):
+    class Meta:
+        model = Grade
+        fields = '__all__'
+
+class ParentPerformanceFilterForm(forms.Form):
+    child = forms.ModelChoiceField(queryset=None)
+    session = forms.ModelChoiceField(queryset=Session.objects.all())
+    exam = forms.ModelChoiceField(queryset=Exam.objects.all())
+
+    def __init__(self, *args, **kwargs):
+        parent = kwargs.pop("parent")
+        super().__init__(*args, **kwargs)
+        self.fields["child"].queryset = Student.objects.filter(parent=parent)
