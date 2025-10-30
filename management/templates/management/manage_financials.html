@@ -1,0 +1,237 @@
+{% extends 'management/base_management_dashboard.html' %}
+{% block main_content %}
+
+<style>
+/* === General Page Layout === */
+.financials {
+    padding: 30px;
+    background-color: #f8fafc;
+    font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+    color: #1e293b;
+}
+
+.page-title {
+    font-size: 28px;
+    margin-bottom: 25px;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+/* === Card Sections === */
+.card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #2c3e50;
+    text-transform: capitalize;
+}
+
+/* === Tables === */
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+    text-align: left;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.styled-table th {
+    background-color: #3498db;
+    color: #fff;
+    padding: 12px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.styled-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.styled-table tr:hover {
+    background-color: #f1f5f9;
+    transition: background-color 0.2s ease;
+}
+
+.empty {
+    text-align: center;
+    color: #94a3b8;
+    font-style: italic;
+}
+
+/* === Buttons === */
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: #3498db;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2980b9;
+}
+
+/* === Action Links === */
+.action-link {
+    margin-right: 10px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.action-link.view {
+    color: #3498db;
+}
+
+.action-link.view:hover {
+    text-decoration: underline;
+}
+
+.action-link.edit {
+    color: #27ae60;
+}
+
+.action-link.edit:hover {
+    text-decoration: underline;
+}
+
+.action-link.delete {
+    color: #e74c3c;
+}
+
+.action-link.delete:hover {
+    text-decoration: underline;
+}
+
+/* === Payment Status === */
+.status {
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.status.paid {
+    background: #2ecc71;
+    color: white;
+}
+
+.status.pending {
+    background: #f39c12;
+    color: white;
+}
+
+.status.failed {
+    background: #e74c3c;
+    color: white;
+}
+</style>
+
+<div class="dashboard-content financials">
+    <h2 class="page-title">💰 Manage Financials</h2>
+
+    <!-- Fee Structures -->
+    <section class="card">
+        <div class="card-header">
+            <h3>Fee Structures</h3>
+            <a href="{% url 'fee_structure_add' %}" class="btn btn-primary">➕ Add Fee Structure</a>
+        </div>
+
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Class</th>
+                    <th>Term</th>
+                    <th>Year</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for structure in fee_structures %}
+                <tr>
+                    <td>{{ structure.class_room.name|capfirst }}</td>
+                    <td>{{ structure.session.term|capfirst }}</td>
+                    <td>{{ structure.session.year }}</td>
+                    <td>KES {{ structure.total_amount_required }}</td>
+                    <td>
+                        <a href="{% url 'fee_structure_view' structure.id %}" class="action-link view">👁 View</a>
+                        <a href="{% url 'fee_structure_edit' structure.id %}" class="action-link edit">✏ Edit</a>
+                        <a href="{% url 'fee_structure_delete' structure.id %}" class="action-link delete">❌ Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="empty">No fee structures defined yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Payments -->
+    <section class="card">
+        <div class="card-header">
+            <h3>Payments</h3>
+            <a href="{% url 'fee_payment_add' %}" class="btn btn-primary">➕ Add Fee Payment</a>
+        </div>
+
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Date</th>
+                    <th>Receipt No</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fee in fees %}
+                <tr>
+                    <td>{{ fee.student.first_name|capfirst }} {{ fee.student.last_name|capfirst }}</td>
+                    <td>KES {{ fee.amount }}</td>
+                    <td>{{ fee.payment_method|capfirst }}</td>
+                    <td>{{ fee.paid_on|date:"M d, Y" }}</td>
+                    <td>{{ fee.receipt_number }}</td>
+                    <td><span class="status {{ fee.status|lower }}">{{ fee.status|capfirst }}</span></td>
+                    <td>
+                        <a href="{% url 'fee_payment_edit' fee.id %}" class="action-link edit">✏ Edit</a>
+                        <a href="{% url 'fee_payment_delete' fee.id %}" class="action-link delete">❌ Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="empty">No payments recorded.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</div>
+{% endblock %}

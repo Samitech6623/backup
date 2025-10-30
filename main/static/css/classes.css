@@ -5,10 +5,16 @@
     border-radius: 10px;
   }
   /* Page heading */
-h1 {
+  .p1{
+    color: rgb(35, 40, 39);
+    font-weight: bold;
+  }
+.classes-header {
     text-align: center;
     color: rgb(165, 112, 42);
     margin-bottom: 10px;
+    font-weight: bold;
+    padding: 20px;
   }
   
   /* Paragraph under the title */

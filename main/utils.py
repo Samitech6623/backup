@@ -5,7 +5,7 @@ from django.contrib.auth import login,logout
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm,AuthenticationForm,PasswordChangeForm,PasswordResetForm
-from .models import Student,Teacher,Parent,Class,SchoolFeeStructure,FeePayment,Announcement,Event,Result,Subject,Exam, Session,Grade
+from .models import Student,Teacher,Parent,ClassRoom,SchoolFeeStructure,FeePayment,Announcement,Event,Result,Subject,Exam, Session,Grade
 from django.urls import reverse_lazy
 from django.db.models import Sum,Count,Avg
 from django.utils import timezone
@@ -14,7 +14,7 @@ from django.db import transaction  # Import transaction for robust saving
 from django.forms import modelformset_factory
 
 
-from .forms import ParentForm, StudentForm, TeacherForm,ClassForm,FeeStructureForm,FeePaymentForm,ExamSelectionForm, ResultForm
+from .forms import ParentForm, StudentForm, TeacherForm,ClassRoomForm,FeeStructureForm,FeePaymentForm,ExamSelectionForm, ResultForm
 from collections import defaultdict
 from decimal import Decimal
 
@@ -150,6 +150,7 @@ def get_or_create_results_for_class(exam, students, subjects):
             Result.objects.get_or_create(student=student, subject=subject, exam=exam)
     return Result.objects.filter(exam=exam, student__in=students)
 
+
 def handle_own_class_results(request, exam, selected_class, students,exam_session):
     subjects = selected_class.subjects.all()
     results = Result.objects.filter(exam=exam, student__in=students)
@@ -176,12 +177,17 @@ def handle_own_class_results(request, exam, selected_class, students,exam_sessio
 
 
 def handle_other_class_results(request, exam, selected_class, students, subjects_taught,exam_session):
+    subjects = selected_class.subjects.all()
+    all_results = Result.objects.filter(exam=exam, student__in=students)
+
+    expected_count = students.count() * subjects.count()
+    if not all_results.exists() or all_results.count() < expected_count:
+        all_results = get_or_create_results_for_class(exam, students, subjects)
     results = Result.objects.filter(
         exam=exam,
         student__in=students,
         subject__in=subjects_taught
     )
-
     ExamResultFormSet = modelformset_factory(Result, form=ResultForm, extra=0)
     formset = ExamResultFormSet(request.POST or None, queryset=results, prefix="other")
 
@@ -198,24 +204,47 @@ def handle_other_class_results(request, exam, selected_class, students, subjects
 
     return formset
 
-def get_fee_summary(student, term, year):
-    # Get the fee structure for the student's current class
-    fee_structure = SchoolFeeStructure.objects.filter(
-        class_name=student.current_class, term=term, year=year
-    ).first()
 
-    amount_required = fee_structure.amount_required if fee_structure else Decimal('0.00')
 
-    # Sum all confirmed payments
+def get_fee_summary(student):
+    # Get current session object
+    current_session = Session.get_active_session()
+
+    if not current_session:
+        return {
+            "required": Decimal("0.00"),
+            "paid": Decimal("0.00"),
+            "balance": Decimal("0.00"),
+            "status": "No Session",
+        }
+
+    # 1. Get ALL sessions up to and including the selected session
+    fee_sumary_active_session = student.fee_summary_current_session()
+    all_relevant_sessions = Session.objects.filter(
+        year__lt=current_session.year
+    ) | Session.objects.filter(
+        year=current_session.year, term__lte=current_session.term
+    )
+
+    # 2. Total required for ALL relevant sessions (past and current)
+    all_fees = SchoolFeeStructure.objects.filter(
+        class_room=student.current_class,
+        session__in=all_relevant_sessions
+    )
+
+    # Sum the stored 'total_amount_required' field (assuming this is kept updated by signals)
+    total_required = all_fees.aggregate(total=Sum("total_amount_required"))["total"] or Decimal("0.00")
+
+    # 3. Total paid so far (for all time)
     total_paid = FeePayment.objects.filter(
         student=student,
         status="CONFIRMED"
-    ).aggregate(total=Sum("amount"))["total"] or Decimal('0.00')
+    ).aggregate(total=Sum("amount"))["total"] or Decimal("0.00")
 
-    # Calculate balance
-    balance = amount_required - total_paid
+    # 4. Calculate balance (Positive: owed, Negative: overpaid)
+    balance = total_required - total_paid
 
-    # Determine status
+    # 5. Determine status
     if balance <= 0:
         status = "Paid in Full" if balance == 0 else "Overpaid"
     elif total_paid == 0:
@@ -223,10 +252,54 @@ def get_fee_summary(student, term, year):
     else:
         status = "Partially Paid"
 
+    # Return the correct balance sign: positive (owed) or negative (credit)
     return {
-        "required": amount_required,
-        "paid": total_paid,
-        "balance": abs(balance),
+        "required_active_session": fee_sumary_active_session['required'],
+        "balance_active_session": fee_sumary_active_session['balance'],
+        "amount_paid_active_session": fee_sumary_active_session['amount_paid'],
+        "total_required": total_required,
+        "total_paid": total_paid,
+        "total_balance": balance, 
         "status": status,
+    }
+
+
+
+def child_latest_exam_summary(child):
+    # Get active session
+    active_session = Session.get_active_session()
+
+    if not active_session:
+        return {
+            "active_session": active_session,
+            "exam": None,
+            "total_score": 0,
+            "average_score": 0,
+            "grade": "-",
+            "remark": "No active session"
+        }
+
+    # Get the latest exam in that session
+    exam = Exam.objects.filter(exam_session=active_session).order_by('-id').first()
+
+    if not exam:
+        return {
+            "active_session": active_session,
+            "exam": None,
+            "total_score": 0,
+            "average_score": 0,
+            "grade": "-",
+            "remark": "No exam yet"
+        }
+
+    summary = child.exam_summary(exam)
+
+    return {
+        "active_session": active_session,
+        "exam": exam,
+        "total_score": summary["total"],
+        "average_score": summary["average"],
+        "grade": summary["grade"],
+        "remark": summary["remark"],
     }
 

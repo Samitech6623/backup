@@ -1,0 +1,138 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block head %}
+    {% block title %}<title>Teacher Dashboard</title>{% endblock %}
+    <link rel="stylesheet" href="{% static 'css/teacher_dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <h2>Teacher</h2>
+        <ul>
+            {# Check if the current URL name matches the link's URL name to apply the 'active' class #}
+            {% with current_url=request.resolver_match.url_name %}
+            
+            <li class="{% if current_url == 'teacher_dashboard' %}active{% endif %}">
+                <a href="{% url 'teacher_dashboard' %}">🏠 Dashboard</a>
+            </li>
+            
+            <li class="{% if current_url == 'teacher_my_classes' %}active{% endif %}">
+                <a href="{% url 'teacher_my_classes' %}">📚 My Classes</a>
+            </li>
+            
+            <li class="{% if current_url == 'teacher_students' %}active{% endif %}">
+                <a href="{% url 'teacher_students' %}">👨‍🎓 Students</a>
+            </li>
+            
+            <li class="{% if current_url == 'teacher_assignments' %}active{% endif %}">
+                <a href="{% url 'teacher_assignments' %}">📝 Assignments</a>
+            </li>
+            
+            <li class="{% if current_url == 'teacher_students_grades_view' %}active{% endif %}">
+                <a href="{% url 'teacher_students_grades_view' %}">📊 Grades</a>
+            </li>
+            
+            <li class="{% if current_url == 'teacher_messages' %}active{% endif %}">
+                <a href="{% url 'teacher_messages' %}">📩 Messages</a>
+            </li>
+
+            <li>
+                <a href="{% url 'portal_logout' %}">🚪 Logout</a>
+            </li>
+            
+            {% endwith %}
+        </ul>
+    </aside>
+
+    <div class="main-content">
+    {% block mainContent %}
+        <h1>Welcome, {{ user.teacher.teacher_name|default:"Teacher"|title }}</h1>
+        <p>Role: Teacher</p>
+        
+        {# Check if the teacher has a class they are a class teacher for #}
+        {% if class_teacher_of %}
+            <p>Class Teacher: **{{class_teacher_of}}**</p>
+        {% else %}
+             <p>Class Teacher: *Not Assigned*</p>
+        {% endif %}
+
+
+        <div class="cards">
+            
+            <div class="card">
+                <h3>Total Students (My Class)</h3>
+                <p>{{total_students_my_class|default:"0"}}</p> 
+            </div>
+            
+            <div class="card">
+                <h3>Total Subjects Assigned</h3>
+                <p>{{total_subjects_assigned|default:"0"}}</p> 
+            </div>
+            
+            <div class="card">
+                <h3>Total Students (Assigned Subjects)</h3>
+                <p>{{total_students_subjects_assigned|default:"0"}}</p>
+            </div>
+
+            <div class="card">
+                <h3>Pending Grades</h3>
+                <p>{{pending_grades|default:"0"}}</p>
+            </div>
+        </div>
+
+        <div class="table-section">
+            <h2>My Assigned Classes</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th>Total Students</th>
+                            <th>Subject</th>
+                            <th>Next Lesson</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for class_assignment in classes_assigned %}
+                            <tr>
+                                <td>{{ class_assignment.class_assigned }}</td>
+                                <td>{{ class_assignment.class_assigned.total_class_students }}</td>
+                                <td>{{ class_assignment.subject }}</td>
+                                <td>N/A</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="4">No classes assigned to you yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="table-section" style="margin-top:20px;">
+            <h2>Upcoming Assignments</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Assignment</th>
+                            <th>Class</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {# You would replace this with a loop over an 'upcoming_assignments' context variable #}
+                        <tr><td colspan="4" style="text-align: center;">*Future Assignment data will appear here*</td></tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endblock %}
+    </div>
+</div>
+{% endblock %}

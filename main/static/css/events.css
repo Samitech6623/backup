@@ -1,12 +1,12 @@
 .events-header {
   padding: 40px 20px 10px;
-  background-color: #ffebcc;
   text-align: center;
 }
 
 .events-header h1 {
   font-size: 2.5rem;
-  color: #ff7b00;
+  font-weight: bold;
+  color: rgb(165, 112, 42);
   margin-bottom: 10px;
 }
 
@@ -62,6 +62,7 @@
 
 .calendar-download {
   text-align: center;
+  color: green;
   padding: 20px;
   margin: 40px 0;
 }

@@ -1,0 +1,145 @@
+{% extends 'management/base_management_dashboard.html' %}
+
+{% block main_content %}
+<div class="dashboard-content">
+    <h2 class="page-title">{{ title }}</h2>
+
+    {% if items %}
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Component Name</th>
+                    <th>Remarks</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ item.display_name }}</td>
+                    <td>{{ item.remark|default:"-" }}</td>
+                    <td>
+                        <a href="{% url 'edit_setting_item' item_type item.id %}" class="btn btn-edit">✏️ Edit</a>
+                        <a href="{% url 'delete_setting_item' item_type item.id %}" class="btn btn-delete">🗑 Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="empty-msg">No grade components found.</p>
+    {% endif %}
+</div>
+<style>
+    /* ---------- Dashboard Content ---------- */
+.dashboard-content {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    font-family: 'Inter', sans-serif;
+}
+
+.page-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* ---------- Table Styling ---------- */
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.styled-table thead {
+    background-color: #1e88e5;
+    color: #fff;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.styled-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.styled-table tbody tr:hover {
+    background-color: #f1f7ff;
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-edit {
+    background-color: #1976d2;
+    color: #fff;
+}
+
+.btn-edit:hover {
+    background-color: #1565c0;
+}
+
+.btn-delete {
+    background-color: #e53935;
+    color: #fff;
+}
+
+.btn-delete:hover {
+    background-color: #c62828;
+}
+
+/* ---------- Empty State ---------- */
+.empty-msg {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+    .styled-table thead {
+        display: none;
+    }
+
+    .styled-table tbody td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        padding-left: 50%;
+        position: relative;
+    }
+
+    .styled-table tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        position: absolute;
+        left: 16px;
+        top: 12px;
+        width: 45%;
+        white-space: nowrap;
+    }
+
+    .styled-table tbody td a.btn {
+        display: inline-block;
+        margin-top: 5px;
+    }
+}
+
+</style>
+{% endblock %}

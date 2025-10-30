@@ -1,0 +1,185 @@
+{% extends 'parents/parent_dashboard.html' %}
+
+{% block main_content %}
+<style>
+    .filter-form {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .filter-form h3 {
+        margin-bottom: 15px;
+        color: #1565c0;
+    }
+
+    .results-table {
+        overflow-x: auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .results-table table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    .results-table th, .results-table td {
+        padding: 12px;
+        border: 1px solid #ccc;
+        text-align: center;
+    }
+
+    .results-table th {
+        background: #1565c0;
+        color: white;
+    }
+
+    .no-results {
+        text-align: center;
+        font-style: italic;
+        color: #888;
+        margin-top: 20px;
+    }
+    .results-table tbody tr:hover {
+  background-color: #f0f7ff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #1565c0;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #0d3a78;
+  box-shadow: 0 4px 12px rgba(21, 101, 192, 0.5);
+}
+
+.message {
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-weight: 600;
+  max-width: 600px;
+}
+
+.message.error {
+  background-color: #ffe5e5;
+  color: #d32f2f;
+  border: 1px solid #d32f2f;
+}
+
+.message.success {
+  background-color: #e6f4ea;
+  color: #2e7d32;
+  border: 1px solid #2e7d32;
+}
+
+.results-summary {
+  display: flex;
+  justify-content: space-around;
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.results-summary span {
+  background: #e8f0fe;
+  padding: 8px 15px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(21, 101, 192, 0.3);
+}
+
+.filter-form button {
+  margin-top: 10px;
+}
+
+@media (max-width: 600px) {
+  .results-table table {
+    font-size: 12px;
+  }
+
+  .results-summary {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+}
+
+</style>
+
+<div class="filter-form">
+     {% if messages %}
+  {% for message in messages %}
+  {%if message.tags == 'error' %}
+    <div style="color: red;">
+    <span style="font-weight: bold;">{{message.tags}}:</span>  {{ message }}
+    </div>
+    {% else %}
+    <div style="color: rgb(127, 182, 44);">
+      <span style="font-weight: bold;">{{message.tags}}:</span>  {{ message }}
+    </div>
+    {% endif %}
+  {% endfor %}
+{% endif %}
+    <h3>🎯 Select a Child,Exam Session and Exam</h3>
+    <form method="get">
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">View Results</button>
+    </form>
+</div>
+
+{% if results %}
+    <div class="results-table">
+
+        <h4>📄 Results for <strong>{{ form.cleaned_data.child }}</strong> - {{ form.cleaned_data.exam }}</h4>
+       <p style="display: flex; flex-direction: row; justify-content: space-around;"> 
+        <span>Total Marks: <span style="font-weight: bold;">{{exam_summary.total}}</span></span>
+        <span>Grade: <span style="font-weight: bold;">{{exam_summary.grade}}</span> </span> 
+         <span>Remarks: {{exam_summary.remark}}</span></p> 
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Score</th>
+                    <th>Grade</th>
+                    <th>Remark</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                    <tr>
+                        <td>{{ result.subject }}</td>
+                        <td>{{ result.score }}</td>
+                        <td>{{ result.grade_object.grade }}</td>
+                        <td>{{ result.grade_object.remark }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <form method="get" action="">
+  <input type="hidden" name="child_id" value="{{ selected_child.id }}">
+  <input type="hidden" name="exam_id" value="{{ selected_exam.id }}">
+  <button type="submit" class="btn btn-primary">Download PDF</button>
+</form>
+{% elif form.is_bound %}
+    <p class="no-results">No results found for this selection.</p>
+{% endif %}
+
+{% endblock %}
+

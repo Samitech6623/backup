@@ -2,11 +2,11 @@
    🌈 Color Variables (optional)
    ====================== */
 :root {
-  --main-orange: #ff7b00;
+  --main-orange: rgb(165, 112, 42);
   --light-orange: #fff0d1;
   --pale-yellow: #ffebcc;
   --text-dark: #333;
-  --text-light: #555;
+  --text-light: #272525;
 }
 
 /* ======================
@@ -22,7 +22,6 @@ a {
    ====================== */
 .gallery-header {
   padding: 40px 20px 10px;
-  background-color: var(--pale-yellow);
   text-align: center;
 }
 
@@ -30,6 +29,7 @@ a {
   font-size: 2.5rem;
   color: var(--main-orange);
   margin-bottom: 10px;
+  font-weight: bold;
 }
 
 .gallery-header p {
@@ -170,5 +170,15 @@ a {
   .cta-button {
     font-size: 0.95rem;
     padding: 8px 16px;
+  }
+  .gallery-filters{
+    display: flex;
+    justify-content: space-between;
+  }
+  .gallery-filters button{
+    width: fit-content;
+    max-height: 50px;
+    font-size: 12px;
+    padding: 10px;
   }
 }

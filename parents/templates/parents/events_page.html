@@ -1,0 +1,242 @@
+{% extends "parents/parent_dashboard.html" %}
+
+{% block main_content %}
+<style>
+/* =================================================================
+   1. BASE STYLES & LAYOUT
+   ================================================================ */
+.main-content {
+    /* Add padding for overall content, especially on desktop */
+    padding: 20px; 
+    max-width: 1200px; /* Constrain max width for large screens */
+    margin: 0 auto;
+}
+
+/* Keep existing header look */
+.section-title {
+    margin-top: 30px;
+    color: #1565c0;
+    font-size: 28px; /* Slightly larger desktop title */
+}
+
+/* Improved intro text style */
+.section-intro {
+    color: #2f6322;
+    font-size: 20px;
+    margin-bottom: 25px; /* More space below intro */
+    padding-left: 10px;
+    border-left: 3px solid #1e1e1e;
+}
+
+/* Friendly, subtle "no data" style */
+.no-data {
+    background: #f9f9f9;
+    border: 1px dashed #ccc;
+    color: #777;
+    text-align: center;
+    font-style: italic;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+/* =================================================================
+   2. GRID LAYOUT
+   ================================================================ */
+.grid {
+    /* Grid on Desktop/Tablet: Use auto-fill to allow 1 or 2 columns, minimum 400px */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* =================================================================
+   3. CARD STYLES
+   ================================================================ */
+.card {
+    display: flex;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.info {
+    padding: 15px;
+    flex-grow: 1;
+}
+
+.info h2 {
+    margin: 0 0 10px;
+    font-size: 18px;
+    color: #1565c0;
+}
+
+.info p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.info .desc {
+    margin-top: 10px;
+    font-style: italic;
+    color: #555;
+    /* Limit announcement height/lines for compactness */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3; /* Show up to 3 lines of description */
+    overflow: hidden;
+}
+
+/* Announcement styling */
+.announcement-card {
+    border-left: 5px solid #ff9800;
+}
+
+.event-card {
+    border-left: 5px solid #1565c0;
+}
+
+/* Event date box */
+.date-box {
+    background: #1565c0;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    width: 80px;
+    flex-shrink: 0;
+    display: flex; /* Added flex to center content vertically */
+    flex-direction: column;
+    justify-content: center;
+}
+
+.date-box .day {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.date-box .month {
+    display: block;
+    font-size: 14px;
+    text-transform: uppercase;
+    line-height: 1.2;
+}
+
+
+/* =================================================================
+   4. MOBILE RESPONSIVENESS (<= 600px)
+   ================================================================ */
+@media (max-width: 600px) {
+    /* Collapse Grid to a single column */
+    .grid {
+        grid-template-columns: 1fr; /* Full width column */
+        gap: 15px;
+    }
+
+    .main-content {
+        padding: 10px;
+    }
+
+    .section-title {
+        font-size: 24px;
+        margin-top: 20px;
+    }
+
+    .section-intro {
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+    
+    /* Ensure cards stack well */
+    .card {
+        flex-direction: column; /* Stack date/info vertically for very small screens */
+    }
+
+    /* Redefine date-box for stacked layout */
+    .date-box {
+        width: 100%; /* Take full width */
+        height: 60px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 0 15px;
+        border-radius: 12px 12px 0 0; /* Match card top border radius */
+    }
+
+    .date-box .day {
+        font-size: 28px;
+        margin-right: 10px;
+    }
+    .date-box .month {
+        font-size: 16px;
+    }
+    
+    /* Remove redundant border on stacked announcement cards */
+    .announcement-card {
+        border-left: none;
+        border-top: 5px solid #ff9800;
+    }
+    .event-card {
+        border-left: none;
+        border-top: 5px solid #1565c0;
+    }
+}
+</style>
+
+<div class="main-content">
+
+    <!-- 📢 Announcements Section -->
+    <h1 class="section-title">📢 Announcements</h1>
+    <p class="section-intro">Stay informed with the latest school announcements and important updates.</p>
+
+    {% if announcements %}
+        <div class="grid">
+            {% for ann in announcements %}
+                <div class="card announcement-card">
+                    <div class="info">
+                        <h2>{{ ann.title }}</h2>
+                        <p class="desc">{{ ann.message }}</p>
+                        <p><small>✍️ Posted by {{ ann.author }}</small></p>
+                        <p class="posted-date"><small>🗓️ Posted on {{ ann.created_on|date:"F j, Y" }}</small></p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-data">🚫 No announcements at this time.</div>
+    {% endif %}
+
+    <!-- 📅 Events Section -->
+    <h1 class="section-title">📅 Upcoming Events</h1>
+    <p class="section-intro">Here are the upcoming school events. Don’t miss out on what’s happening!</p>
+
+    {% if events %}
+        <div class="grid">
+            {% for event in events %}
+                <div class="card event-card">
+                    <div class="date-box">
+                        <span class="day">{{ event.date|date:"d" }}</span>
+                        <span class="month">{{ event.date|date:"M" }}</span>
+                    </div>
+                    <div class="info">
+                        <h2>{{ event.name }}</h2>
+                        <p><strong>📍 Location:</strong> {{ event.location }}</p>
+                        <p class="desc">{{ event.description }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-data">📭 No upcoming events at the moment. Stay tuned!</div>
+    {% endif %}
+
+</div>
+{% endblock %}

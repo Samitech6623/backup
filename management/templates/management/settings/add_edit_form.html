@@ -1,0 +1,93 @@
+{% extends 'management/base_management_dashboard.html' %}
+{% block main_content %}
+
+<style>
+    .form-card {
+    max-width: 500px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.form-card h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+    font-weight: bold;
+}
+
+.form-card form p {
+    margin-bottom: 15px;
+}
+
+.form-card label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #444;
+}
+
+.form-card input, 
+.form-card select, 
+.form-card textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.form-card input:focus, 
+.form-card select:focus, 
+.form-card textarea:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: 0.3s ease;
+}
+
+.btn.save {
+    background: #28a745;
+    color: white;
+}
+
+.btn.cancel {
+    background: #dc3545;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+
+</style>
+<div class="form-card">
+    <h2>{{ action|title }} {{model_name|title}}</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn save">💾 Save</button>
+        <a href="{% url go_to_url item_type %}" class="btn cancel">Cancel</a>
+    </form>
+</div>
+{% endblock %}

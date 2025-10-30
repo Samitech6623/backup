@@ -1,0 +1,125 @@
+{% extends 'management/base_management_dashboard.html' %}
+
+{% block main_content %}
+<div class="main-content">
+    {% if fee_structure %}
+        <div class="fee-structure-card">
+            <div class="fee-header">
+                <h2>{{ fee_structure.display_name|title }}</h2>
+                <p class="total"><strong>Total Amount Required:</strong> 
+                    <span class="amount">{{ fee_structure.total_amount_required }}</span>
+                </p>
+            </div>
+
+            <div class="fee-components">
+                <h3>Components</h3>
+                <ul class="component-list">
+                    {% for component in fee_structure.components.all %}
+                        <li class="component-item">
+                            <span class="component-name">{{ component.name }}</span>
+                            <span class="component-amount">{{ component.amount }}</span>
+                        </li>
+                    {% empty %}
+                        <li class="no-components">No components available.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% else %}
+        <div class="no-fee-structure">
+            No fee structure selected.
+        </div>
+    {% endif %}
+</div>
+
+<style>
+/* --- Base Layout --- */
+.main-content {
+    padding: 2rem;
+    background-color: #f8fafc;
+    font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+    color: #1e293b;
+}
+
+/* --- Card Container --- */
+.fee-structure-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 2rem;
+    max-width: 700px;
+    margin: 0 auto;
+    transition: box-shadow 0.3s ease;
+}
+
+.fee-structure-card:hover {
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+/* --- Header --- */
+.fee-header h2 {
+    font-weight: bold;
+    font-size: 1.6rem;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+}
+
+.fee-header .total {
+    font-size: 1rem;
+    color: #475569;
+    margin-bottom: 1rem;
+}
+
+.fee-header .amount {
+    font-weight: bold;
+    color: #0ea5e9;
+}
+
+/* --- Components Section --- */
+.fee-components h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0.25rem;
+}
+
+.component-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.component-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    background-color: #f1f5f9;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.component-item:hover {
+    background-color: #e2e8f0;
+}
+
+.component-name {
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.component-amount {
+    color: #0284c7;
+    font-weight: bold;
+}
+
+/* --- Empty / Fallback States --- */
+.no-components, .no-fee-structure {
+    text-align: center;
+    color: #94a3b8;
+    font-style: italic;
+    margin-top: 1rem;
+}
+</style>
+{% endblock %}

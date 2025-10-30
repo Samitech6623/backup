@@ -1,0 +1,110 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="gallery1">
+    <img src="{% static 'images/pic2.jpeg' %}" alt="Gallery Image">
+</div>
+
+<div class="main-content">
+
+    <!-- Intro Section -->
+    <section class="intro-section">
+        <h2 class="section-title">Programmes Offered in Our School</h2>
+        <hr>
+        <p class="section-text">
+            EdenField Academy provides a nurturing, stimulating, and playful environment for children in their early years.
+        </p>
+        <p class="section-text">
+            We offer a holistic approach to early childhood education, focusing on emotional, social, cognitive, and physical 
+            development through our four foundational programmes: Daycare, Playgroup, Pre-Primary 1, and Pre-Primary 2.
+        </p>
+    </section>
+
+    <!-- Daycare Programme -->
+    <section class="programme-row">
+        <div>
+            <img src="{% static 'images/pic5.jpeg' %}" alt="Daycare" class="programme-img">
+        </div>
+        <div>
+            <h3 class="programme-title">Daycare Programme</h3>
+            <hr>
+            <p class="programme-text">
+                Our daycare provides a safe, warm, and caring environment where infants and toddlers are lovingly cared for throughout the day. 
+            </p>
+            <p class="programme-text">
+                With trained caregivers and age-appropriate activities, children develop trust, security, and basic motor and 
+                communication skills through play-based learning.
+            </p>
+        </div>
+    </section>
+
+    <!-- Playgroup Programme -->
+    <section class="programme-row">
+        <div>
+            <h3 class="programme-title">Playgroup Programme</h3>
+            <hr>
+            <p class="programme-text">
+                Our playgroup classes introduce children to structured routines, interactive play, music, and storytelling. 
+            </p>
+            <p class="programme-text">
+                Through social interaction and creative exploration, children begin to build early language and social skills, 
+                laying the foundation for lifelong learning in a fun, supportive environment.
+            </p>
+        </div>
+        <div>
+            <img src="{% static 'images/pic3.jpeg' %}" alt="Playgroup" class="programme-img">
+        </div>
+    </section>
+
+    <!-- Pre-Primary 1 -->
+    <section class="programme-row">
+        <div>
+            <img src="{% static 'images/pic2.jpeg' %}" alt="Pre-Primary 1" class="programme-img">
+        </div>
+        <div>
+            <h3 class="programme-title">Pre-Primary 1</h3>
+            <hr>
+            <p class="programme-text">
+                In Pre-Primary 1, children begin more structured learning experiences in literacy, numeracy, and creative expression. 
+            </p>
+            <p class="programme-text">
+                Our curriculum encourages curiosity and independent thinking through hands-on activities, storytelling, and group learning.
+            </p>
+        </div>
+    </section>
+
+    <!-- Pre-Primary 2 -->
+    <section class="programme-row last-row">
+        <div>
+            <h3 class="programme-title">Pre-Primary 2</h3>
+            <hr>
+            <p class="programme-text">
+                Pre-Primary 2 is designed to prepare children for primary school. We focus on foundational literacy and numeracy skills, 
+                as well as critical thinking and problem-solving through interactive lessons and collaborative learning. 
+            </p>
+            <p class="programme-text">
+                Emotional and social development continues to be a key focus as we build confident and school-ready learners.
+            </p>
+        </div>
+        <div>
+            <img src="{% static 'images/pic4.jpeg' %}" alt="Pre-Primary 2" class="programme-img">
+        </div>
+    </section>
+
+    <!-- Closing Section -->
+    <section class="closing-section">
+        <h2 class="section-title text-center">Why Choose EdenField Academy?</h2>
+        <hr>
+        <p class="section-text">
+            At EdenField, we believe in the power of early education to shape young minds. 
+            Our passionate team, child-friendly facilities, and creative curriculum offer the perfect start for every child's learning journey.
+        </p>
+    </section>
+
+</div>
+{% endblock %}

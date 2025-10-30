@@ -1,9 +1,9 @@
 from django.contrib import admin
 from .models import (
-    Management, Parent, Class, Student, 
+    Management, Parent, ClassRoom, Student, 
     Teacher, Subject, TeachingClassAssignment, 
     FeePayment, Result, SchoolFeeStructure, 
-    Announcement, Event,Session, Exam,Grade
+    Announcement, Event,Session, Exam,Grade,FeeComponent,GradingSystem
 
 )
 
@@ -11,7 +11,7 @@ from .models import (
 
 admin.site.register(Management)
 admin.site.register(Parent)
-admin.site.register(Class)
+admin.site.register(ClassRoom)
 admin.site.register(Student)
 admin.site.register(Teacher)
 admin.site.register(Subject)
@@ -24,3 +24,6 @@ admin.site.register(Event)
 admin.site.register(Session)
 admin.site.register(Exam)
 admin.site.register(Grade)
+admin.site.register(FeeComponent)
+admin.site.register(GradingSystem)
+

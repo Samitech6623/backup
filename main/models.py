@@ -3,6 +3,8 @@ from django.db.models import Sum,Avg
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 
 # Create your models here.
 
@@ -18,23 +20,58 @@ class Session(models.Model):
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["term", "year"], name="unique_term_year")
+        ]
+    @property
+    def display_name(self):
+        return (f"{self.term} Year {self.year}")
+
     @property
     def is_active(self):
         today = timezone.now().date()
-        return self.start_date <= today <= self.end_date
+        if self.start_date and self.end_date:
+            return self.start_date <= today <= self.end_date
+        return False
+    @classmethod
+    def get_active_session(cls):
+  
+        today = timezone.now().date()
+        try:
+            active_session = cls.objects.get(
+                start_date__lte=today, 
+                end_date__gte=today
+            )
+            return active_session
+        except cls.DoesNotExist:
+            pass 
+        
+        latest_ended_session = cls.objects.filter(
+            end_date__lte=today
+        ).order_by(
+            '-end_date'
+        ).first()
+
+        if latest_ended_session:
+            return latest_ended_session
+        
+        return cls.objects.all().order_by('-end_date').first()
 
     def __str__(self):
         return (f"{self.term} Year {self.year}")
 
+
+
 class Management(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='management_profile')
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='management')
     is_admin_user = models.BooleanField(default=True)
 
     def __str__(self):
         return  "school admin"
 
 class Parent(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='parent_profile')
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='parent')
     full_name = models.CharField(max_length=100)
     phone = models.CharField(max_length=15)
     email = models.EmailField(unique=True, null=True, blank=True) 
@@ -54,6 +91,40 @@ class Parent(models.Model):
         if linked_user:
             linked_user.delete()
 
+class Grade(models.Model):
+    min_score = models.DecimalField(max_digits=5, decimal_places=2)
+    max_score = models.DecimalField(max_digits=5, decimal_places=2)
+    grade = models.CharField(max_length=2)
+    remark = models.CharField(max_length=50)
+
+    class Meta:
+        ordering = ['-min_score']
+
+    @property
+    def display_name(self):
+        return f"{self.min_score} - {self.max_score} : {self.grade}"
+
+    def clean(self):
+        """Ensure min_score is less than max_score."""
+        if self.min_score >= self.max_score:
+            raise ValidationError(
+                'min_score must be strictly less than max_score.'
+            )
+        # You could also check for negative values if scores must be non-negative
+        if self.min_score < 0:
+             raise ValidationError('Scores cannot be negative.')
+
+    def save(self, *args, **kwargs):
+        if self.grade:
+            self.grade = self.grade.upper()
+            self.full_clean()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.grade} ({self.min_score}-{self.max_score})"
+
+
+
 class Subject(models.Model):
     name = models.CharField(max_length=100, unique=True)
     code = models.CharField(max_length=10, unique=True)
@@ -61,7 +132,7 @@ class Subject(models.Model):
     def __str__(self):
         return self.name
     
-class Class(models.Model):
+class ClassRoom(models.Model):
     name = models.CharField(max_length=50, unique=True)
     class_teacher = models.OneToOneField(
         "Teacher", on_delete=models.SET_NULL, null=True, blank=True, related_name="class_teacher"
@@ -75,10 +146,19 @@ class Class(models.Model):
     @property
     def total_class_students(self):
         return self.students.count()
-    def class_perfomance_summary(self):
-        return
+ 
 
     def __str__(self):
+        return self.name
+
+class GradingSystem(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    grade_components = models.ManyToManyField(Grade, related_name="grade_components")
+    classes = models.ManyToManyField(ClassRoom, blank=True, related_name="grading_systems")
+    subjects = models.ManyToManyField(Subject, blank=True, related_name="grading_systems")
+
+    @property
+    def display_name(self):
         return self.name
 
 
@@ -95,7 +175,7 @@ class Student(models.Model):
     admission_number = models.CharField(max_length=20, unique=True)
     enrollment_date = models.DateField()
     current_class = models.ForeignKey(
-        Class, on_delete=models.SET_NULL, null=True, blank=True, related_name="students"
+        ClassRoom, on_delete=models.SET_NULL, null=True, blank=True, related_name="students"
     )   
     is_active = models.BooleanField(default=True)
 
@@ -126,24 +206,32 @@ class Student(models.Model):
         }
 
     
-    def total_fees_paid(self):
-        return self.fee_payment.filter(status="CONFIRMED").aggregate(total=Sum("amount"))["total"] or 0
+    def total_fees_paid_current_session(self,active_session):
+        return self.fee_payment.filter(status="CONFIRMED",paid_on__gte = active_session.start_date).aggregate(total=Sum("amount"))["total"] or 0
 
-    def fee_balance(self, term, year):
-        try:
-            structure = SchoolFeeStructure.objects.get(
-                class_name=self.current_class, term=term, year=year
-            )
-            required = structure.amount_required
-        except SchoolFeeStructure.DoesNotExist:
-            required = 0
-        return required - self.total_fees_paid()
+    def fee_summary_current_session(self):
+        active_session = Session.get_active_session()
+        if active_session:
+            amount_paid = self.total_fees_paid_current_session(active_session)
+            try:
+                structure = SchoolFeeStructure.objects.get(
+                    class_room=self.current_class, session = active_session
+                )
+                required = structure.total_amount_required
+            except SchoolFeeStructure.DoesNotExist:
+                required = 0
+            balance = required - amount_paid
+            return {"balance":balance,"required":required,"amount_paid":amount_paid}
+        else:
+            return {"balance":0,"required":0,"amount_paid":0}
+
+       
     
     def __str__(self):
         return (f"{self.first_name} {self.last_name} {self.admission_number}") 
     
 class Teacher(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='teacher_profile')
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='teacher')
     teacher_name = models.CharField(max_length=100)
     email = models.EmailField(unique=True, null=True, blank=True) 
     phone = models.CharField(max_length=15)
@@ -172,9 +260,12 @@ class Teacher(models.Model):
 
 class TeachingClassAssignment(models.Model):
     teacher = models.ForeignKey("Teacher", on_delete=models.CASCADE, related_name="teaching_class_assignments")
-    class_assigned = models.ForeignKey("Class", on_delete=models.CASCADE, related_name="teaching_class_assignments")
+    class_assigned = models.ForeignKey("ClassRoom", on_delete=models.CASCADE, related_name="teaching_class_assignments")
     subject = models.ForeignKey("Subject", on_delete=models.CASCADE, related_name="teaching_class_assignments")
 
+    @property
+    def display_name(self):
+        return f"{self.teacher} teaches {self.subject} in {self.class_assigned}"
     def __str__(self):
         return f"{self.teacher} teaches {self.subject} in {self.class_assigned}"
 
@@ -207,14 +298,18 @@ class FeePayment(models.Model):
 class Exam(models.Model):
     exam_name = models.CharField(max_length=150, blank=False,null=False)
     exam_session = models.ForeignKey(Session,on_delete=models.CASCADE)
-    exam_classes = models.ManyToManyField(Class,related_name="exam_classes")
+    exam_classes = models.ManyToManyField(ClassRoom,related_name="exam_classes")
 
     class Meta:
         unique_together = ("exam_name", "exam_session")  # ✅ valid combo
         verbose_name_plural = "Exams"
 
+    @property
+    def display_name(self):
+        return f"{self.exam_name} - {self.exam_session.term} - {self.exam_session.year} Exam"
+
     def __str__(self):
-        return f"{self.exam_name} ({self.exam_session.term} - {self.exam_session.year})"
+        return f"{self.exam_name} ({self.exam_session.term} - {self.exam_session.year}) - Exam"
 
 class Result(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name="results")
@@ -244,21 +339,31 @@ class Result(models.Model):
 
         return f"{self.student} - {self.subject} ({grade_str})"
 
-
+class FeeComponent(models.Model):
+    name = models.CharField(max_length=50)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    @property
+    def display_name(self):
+        return f"{self.name}: {self.amount}"
+    def __str__(self):
+        return f"{self.name}: {self.amount}"
 
 class SchoolFeeStructure(models.Model):
-    class_name = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="fee_structures")
-    term = models.CharField(max_length=20)  # e.g. "Term 1"
-    year = models.IntegerField()
-    amount_required = models.DecimalField(max_digits=10, decimal_places=2)
+    class_room = models.ForeignKey(ClassRoom, on_delete=models.CASCADE, related_name="fee_structures")
+    session = models.ForeignKey(Session,on_delete = models.CASCADE)
+    components = models.ManyToManyField(FeeComponent, related_name='fee_structures')
+    total_amount_required = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     @property
     def display_name(self):
-        return f"{self.class_name} -Term: {self.term} Year:{self.year} fee structure"
-
+        return f"{self.class_room.name} -- {self.session.term} -- {self.session.year} fee structure"
+    def calculate_total_amount_required(self):
+        total = self.components.aggregate(total=Sum('amount'))['total'] or 0
+        self.total_amount_required = total
+        self.save(update_fields=['total_amount_required']) # Only update the total field
 
     def __str__(self):
-        return f"{self.class_name} - {self.term} {self.year} - {self.amount_required}"
+        return f"{self.class_room} - {self.session.term} {self.session.year} - {self.total_amount_required}"
     
 
 
@@ -291,33 +396,7 @@ class Event(models.Model):
         return f"{self.name} ({self.date})"
 
 
-class Grade(models.Model):
-    min_score = models.DecimalField(max_digits=5, decimal_places=2)
-    max_score = models.DecimalField(max_digits=5, decimal_places=2)
-    grade = models.CharField(max_length=2)
-    remark = models.CharField(max_length=50)
 
-    class Meta:
-        ordering = ['-min_score']
-
-    def clean(self):
-        """Ensure min_score is less than max_score."""
-        if self.min_score >= self.max_score:
-            raise ValidationError(
-                'min_score must be strictly less than max_score.'
-            )
-        # You could also check for negative values if scores must be non-negative
-        if self.min_score < 0:
-             raise ValidationError('Scores cannot be negative.')
-
-    def save(self, *args, **kwargs):
-        if self.grade:
-            self.grade = self.grade.upper()
-            self.full_clean()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.grade} ({self.min_score}-{self.max_score})"
 
 
 

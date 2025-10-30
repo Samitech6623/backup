@@ -1,0 +1,106 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block head %}  
+  <title>{% block title %}About Us{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'css/about.css' %}">
+<style>
+.hero-overlay {
+     background-image: url("{% static 'images/pic4.jpeg' %}");
+background-size: cover;
+ background-repeat: no-repeat;
+  background-position: center; 
+    filter: blur(8px);
+      transform: scale(1.1); /* prevents blur clipping at edges */
+}
+
+</style>
+{% endblock %}
+{% block content %}
+<div>
+
+  <!-- Hero Section -->
+ <section class="hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <h1>About Our School</h1>
+  </div>
+</section>
+
+
+
+  <!-- Who We Are -->
+  <section class="section" aria-labelledby="who-we-are">
+    <h2 id="who-we-are">Who We Are</h2>
+    <p>EdenField Academy is a nurturing early learning center located in Muchatha, Kiambu County — between Ruaka and Banana.</p>
+    <p>We are dedicated to helping children grow through love, play, and structured learning.</p>
+    <p>We believe that the foundation of a happy, successful life begins in the early years — and we're here to make every moment count.</p>
+
+    <p>Our experienced and compassionate teachers are the heart of our learning community.</p>
+    <p>Each educator is carefully selected not only for their qualifications but also for their passion for early childhood development.</p>
+    <p>Our classrooms are safe, vibrant, and thoughtfully designed to inspire curiosity and creativity.</p>
+    <p>With small class sizes, personalized attention, and a warm, welcoming atmosphere, we ensure every child feels seen, supported, and empowered to learn at their own pace.</p>
+    <p>The combination of nurturing staff and a stimulating environment makes EdenField the perfect place for young minds to grow and thrive.</p>
+  </section>
+
+  <!-- Vision and Mission -->
+  <section class="section" aria-labelledby="vision-mission">
+    <h2 id="vision-mission">Our Vision & Mission</h2>
+    <p><strong>Our Vision:</strong> To be a place where every child feels safe, inspired, and excited to learn.</p>
+    <p><strong>Our Mission:</strong> To support children's growth through a balanced blend of play, creativity, social interaction, and early academics.</p>
+  </section>
+
+  <!-- Core Values -->
+  <section class="section" aria-labelledby="core-values">
+    <h2 id="core-values">Our Core Values</h2>
+    <div class="values">
+      <article class="value-box">
+        <strong>Care & Safety</strong>
+        <p>We provide a warm, secure environment where every child is loved and protected.</p>
+      </article>
+      <article class="value-box">
+        <strong>Creativity</strong>
+        <p>We encourage imagination through music, art, storytelling, and exploration.</p>
+      </article>
+      <article class="value-box">
+        <strong>Curiosity</strong>
+        <p>We nurture children's natural desire to explore, question, and learn.</p>
+      </article>
+      <article class="value-box">
+        <strong>Community</strong>
+        <p>We value teamwork and support between families, teachers, and children.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Programmes -->
+  <section class="section" aria-labelledby="our-programmes">
+    <h2 id="our-programmes">Our Programmes</h2>
+    <div class="programmes">
+      <article class="programme-card">
+        <strong>Daycare</strong>
+        <p>Caring for children in a loving, play-based environment while parents are away.</p>
+      </article>
+      <article class="programme-card">
+        <strong>Playgroup</strong>
+        <p>Introducing routines, music, stories, and basic social skills through play.</p>
+      </article>
+      <article class="programme-card">
+        <strong>Pre-Primary 1</strong>
+        <p>Developing early literacy, numeracy, and independence through hands-on learning.</p>
+      </article>
+      <article class="programme-card">
+        <strong>Pre-Primary 2</strong>
+        <p>Preparing children for primary school with strong foundations in reading, math, and confidence.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section class="cta" aria-labelledby="visit-us">
+    <h3 id="visit-us">Visit Us Today!</h3>
+    <p>Come see how EdenField can be the perfect start for your child's learning journey.</p>
+  </section>
+
+</div>
+{% endblock %}

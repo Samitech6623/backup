@@ -1,0 +1,129 @@
+{% extends 'management/base_management_dashboard.html' %}
+{% block main_content %}
+<div class="dashboard-content">
+    <h2>📢 Manage Announcements</h2>
+
+    <a href="{% url 'announcement_add' %}" class="btn add-btn">➕ Add Announcement</a>
+
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>NO</th>
+                <th>Title</th>
+                <th>Message</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for announcement in announcements %}
+            <tr>
+                <td><strong>{{ forloop.counter }}.</strong></td>
+                <td>{{ announcement.title }}</td>
+                <td class="message-cell">
+                    <span class="message-short">{{ announcement.message|truncatechars:50 }}</span>
+                    <span class="message-full" style="display:none;">{{ announcement.message }}</span>
+                </td>
+                <td>{{ announcement.created_on|date:"M d, Y H:i" }}</td>
+                <td>
+                    <a href="{% url 'announcement_edit' announcement.id %}" class="action-link">✏ Edit</a> |
+                    <a href="{% url 'announcement_delete' announcement.id %}" class="action-link delete">❌ Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">No announcements yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+.dashboard-content h2 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.btn.add-btn {
+    background: #27ae60;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    margin-bottom: 15px;
+    display: inline-block;
+}
+.btn.add-btn:hover {
+    background: #1e8449;
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.styled-table th, .styled-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+.styled-table th {
+    background: #3498db;
+    color: #fff;
+}
+.styled-table tr:hover {
+    background: #f5f5f5;
+}
+.styled-table tbody tr {
+    cursor: pointer;
+}
+.action-link {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+}
+.action-link.delete {
+    color: #e74c3c;
+}
+.action-link:hover {
+    text-decoration: underline;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const rows = document.querySelectorAll(".styled-table tbody tr");
+    let activeRow = null;
+
+    rows.forEach(row => {
+        const shortMsg = row.querySelector(".message-short");
+        const fullMsg = row.querySelector(".message-full");
+
+        if (!shortMsg || !fullMsg) return;
+
+        row.addEventListener("click", () => {
+            // Collapse previously active row
+            if (activeRow && activeRow !== row) {
+                activeRow.querySelector(".message-short").style.display = "inline";
+                activeRow.querySelector(".message-full").style.display = "none";
+            }
+
+            // Toggle current row
+            if (fullMsg.style.display === "none") {
+                shortMsg.style.display = "none";
+                fullMsg.style.display = "inline";
+                activeRow = row;
+            } else {
+                shortMsg.style.display = "inline";
+                fullMsg.style.display = "none";
+                activeRow = null;
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

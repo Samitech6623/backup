@@ -1,0 +1,71 @@
+{% extends 'management/base_management_dashboard.html' %}
+
+{% block main_content %}
+<div class="dashboard-content delete-card">
+    <h2 class="delete-title">🗑 Delete {{ item_type }}</h2>
+    <p class="delete-warning">
+        Are you sure you want to delete <br> the {{item_type}} <strong>{{ object.display_name }}</strong>?<br>
+        This action cannot be undone.
+    </p>
+
+    <form method="post" class="delete-form">
+        {% csrf_token %}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-delete">❌ Yes, Delete</button>
+            <a href="{% url go_to_url item_type %}" class="btn btn-cancel">✖ Cancel</a>
+        </div>
+    </form>
+</div>
+
+<style>
+.delete-card {
+    max-width: 500px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    text-align: center;
+}
+.delete-title {
+    color: #dc3545;
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+}
+.delete-warning {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+/* Buttons */
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+.btn {
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: 0.3s;
+    border: none;
+    cursor: pointer;
+}
+.btn-delete {
+    background: #dc3545;
+    color: #fff;
+}
+.btn-delete:hover {
+    background: #c82333;
+}
+.btn-cancel {
+    background: #6c757d;
+    color: #fff;
+}
+.btn-cancel:hover {
+    background: #565e64;
+}
+</style>
+{% endblock %}

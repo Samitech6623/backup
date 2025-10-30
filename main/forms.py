@@ -1,6 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from .models import Parent, Student, Teacher,Class,User,SchoolFeeStructure,FeePayment, Announcement, Event,Session, Exam, Result,Grade
+from .models import (Parent, Student, Teacher,ClassRoom,User,SchoolFeeStructure,FeePayment,
+        Announcement, Event,Session, Exam, Result,Grade,FeeComponent,Subject,GradingSystem,TeachingClassAssignment)
 
 
 class UserForm(UserCreationForm):
@@ -35,9 +36,9 @@ class TeacherForm(forms.ModelForm):
         model = Teacher
         fields = [ "teacher_name" , "email" , "phone" ]
 
-class ClassForm(forms.ModelForm):
+class ClassRoomForm(forms.ModelForm):
     class Meta:
-        model = Class
+        model = ClassRoom
         fields = '__all__'
 
         widgets = {
@@ -47,13 +48,16 @@ class ClassForm(forms.ModelForm):
 class FeeStructureForm(forms.ModelForm):
     class Meta:
         model = SchoolFeeStructure
-        fields = '__all__'
+        fields = ["class_room","session","components"]
+        widgets = {
+            "components": forms.CheckboxSelectMultiple(attrs={'class':'multiple-input-container'})
+        }
 
+        
 class FeePaymentForm(forms.ModelForm):
     class Meta:
         model = FeePayment
         fields = '__all__'
-
         widgets = {
             'paid_on': forms.DateInput(attrs={'type':'date'})
         }
@@ -93,7 +97,7 @@ class ExamSelectionForm(forms.Form):
         widget=forms.Select(attrs={"class": "form-control"})
     )
     class_selected = forms.ModelChoiceField(
-        queryset=Class.objects.all(),
+        queryset=ClassRoom.objects.all(),
         label="Select Class",
         widget=forms.Select(attrs={"class": "form-control"})
     )
@@ -115,6 +119,11 @@ class GradeForm(forms.ModelForm):
         model = Grade
         fields = '__all__'
 
+class GradingSystemForm(forms.ModelForm):
+    class Meta:
+        model = GradingSystem
+        fields = '__all__'
+
 class ParentPerformanceFilterForm(forms.Form):
     child = forms.ModelChoiceField(queryset=None)
     session = forms.ModelChoiceField(queryset=Session.objects.all())
@@ -124,3 +133,46 @@ class ParentPerformanceFilterForm(forms.Form):
         parent = kwargs.pop("parent")
         super().__init__(*args, **kwargs)
         self.fields["child"].queryset = Student.objects.filter(parent=parent)
+
+class FeeStructureSelectionForm(forms.Form):
+    session = forms.ModelChoiceField(
+        queryset=Session.objects.all(),
+        label="Select Session",
+        widget=forms.Select(attrs={"class": "form-control"})
+    )
+    class_room = forms.ModelChoiceField(queryset=ClassRoom.objects.all().order_by('name'),
+        label="Select Class",
+        widget=forms.Select(attrs={"class": "form-control"})
+        )
+    
+class FeeComponentForm(forms.ModelForm):
+    class Meta:
+        model = FeeComponent
+        fields = "__all__"
+
+class ExamCreationForm(forms.ModelForm):
+    class Meta:
+        model = Exam
+        fields = "__all__"
+        widget = {
+        "exam_classes":forms.CheckboxSelectMultiple()
+        }
+
+class SubjectForm(forms.ModelForm):
+    class Meta:
+        model = Subject
+        fields = "__all__"
+
+class SessionCreationForm(forms.ModelForm):
+    class Meta:
+        model = Session
+        fields = "__all__"
+        widgets = {
+            "start_date":forms.DateInput(attrs={'type': 'date'}),
+            "end_date":forms.DateInput(attrs={'type': 'date'})
+        }
+class TeachingClassAssignmentForm(forms.ModelForm):
+    class Meta:
+        model = TeachingClassAssignment
+        fields = "__all__"
+        

@@ -1,0 +1,89 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block head %}
+{% block title %}<title>Management Dashboard</title>{% endblock %}
+<link rel="stylesheet" href="{% static 'css/management_dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2>Management</h2>
+        <ul>
+            <li><a href="{% url 'management_dashboard' %}">🏠 Dashboard</a></li>
+            <li><a href="{% url 'manage_parents' %}">👨‍👩‍👦 Manage Parents</a></li>
+            <li><a href="{% url 'manage_teachers' %}">👩‍🏫 Teachers</a></li>
+            <li><a href="{% url 'manage_students' %}">👨‍🎓 Students</a></li>
+            <li><a href="{% url 'manage_classes' %}">📚 Manage Classes</a></li>
+            <li><a href="{% url 'manage_events' %}">📅 Manage Events</a></li>
+            <li><a href="{% url 'manage_announcements' %}">📢 Manage Announcements</a></li>
+            <li><a href="{% url 'reports_portal' %}">📊 Reports</a></li>
+            <li><a href="{% url 'manage_financials' %}">💰 Finances</a></li>
+            <li><a href="{% url 'settings_page' %}">⚙ Settings</a></li>
+            <li><a href="{% url 'portal_logout' %}">🚪 Logout</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      {% block main_content %}
+        <h1>Welcome, {{ request.user.username|title }}</h1>
+        <p>Role: Management</p>
+
+        <!-- Dashboard Cards -->
+        <div class="cards">
+            <div class="card">
+                <h3>Total Students</h3>
+                <p>{{total_students}}</p>
+            </div>
+            <div class="card">
+                <h3>Total Teachers</h3>
+                <p>{{total_teachers}}</p>
+            </div>
+             <div class="card">
+                <h3>Total Parents</h3>
+                <p>{{total_parents}}</p>
+            </div>
+            <div class="card">
+                <h3>Pending Admissions</h3>
+                <p>23</p>
+            </div>
+           
+        </div>
+
+        <!-- Reports Table -->
+        <div class="table-section">
+            <h2>Recent Reports</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Report</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>01 Oct 2025</td>
+                        <td>Term 3 Fee Summary</td>
+                        <td><span class="status completed">Completed</span></td>
+                    </tr>
+                    <tr>
+                        <td>28 Sep 2025</td>
+                        <td>Exam Performance Report</td>
+                        <td><span class="status pending">Pending</span></td>
+                    </tr>
+                    <tr>
+                        <td>25 Sep 2025</td>
+                        <td>Teacher Attendance</td>
+                        <td><span class="status completed">Completed</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}

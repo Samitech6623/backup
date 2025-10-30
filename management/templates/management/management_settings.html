@@ -1,0 +1,154 @@
+{% extends 'management/base_management_dashboard.html' %}
+{% block main_content %}
+<div class="dashboard-content">
+    <div class="card" style="text-align: center; padding: 50px;">
+        <h2>⚙️ Settings</h2>
+        <p style="color: #888; font-size: 16px; margin-top: 10px;">
+            Manage system settings and configurations below.
+        </p>
+
+        <div class="settings-options">
+            <div class="settings-card">
+                <h3>🧮 Exam Models</h3>
+                <p>Create or manage exam grading models.</p>
+                <a href="{% url 'register_setting_item' 'exam-model' %}" class="btn">➕ Register New Model</a>
+                <a href="{% url 'view_setting_item' 'exam-model' %}" class="btn" style="background: #27ae60; margin-left: 10px;">👁 View Models</a>
+            </div>
+
+            <div class="settings-card">
+                <h3>🧮 Grading system Models</h3>
+                <p>Create or manage the grading system.</p>
+                <a href="{% url 'register_setting_item' 'grading-system' %}" class="btn">➕ Register New Model</a>
+                <a href="{% url 'view_setting_item' 'grading-system' %}" class="btn" style="background: #27ae60; margin-left: 10px;">👁 View Models</a>
+            </div>
+
+            <div class="settings-card">
+                <h3>🧮 Grading system components</h3>
+                <p>Create or manage the grading system.</p>
+                <a href="{% url 'register_setting_item' 'grade-component' %}" class="btn">➕ Register New Model</a>
+                <a href="{% url 'view_setting_item' 'grade-component' %}" class="btn" style="background: #27ae60; margin-left: 10px;">👁 View Components</a>
+            </div>
+
+            <div class="settings-card">
+                <h3>📆 Academic Sessions</h3>
+                <p>Manage school terms and academic years.</p>
+                <a href="{% url 'register_setting_item' 'session' %}" class="btn">➕ Add New Session</a>
+                <a href="{% url 'view_setting_item' 'session' %}" class="btn" style="background: #27ae60; margin-left: 10px;">👁 View Sessions</a>
+            </div>
+
+            <div class="settings-card">
+                <h3>🏫 Classes</h3>
+                <p>Create or manage class information.</p>
+                <a href="{% url 'class_add' %}" class="btn">➕ Register New Class</a>
+                <a href="{% url 'manage_classes'  %}" class="btn" style="background: #27ae60; margin-left: 10px;">👁 View Classes</a>
+            </div>
+
+            <div class="settings-card">
+                <h3>📆 Subjects </h3>
+                <p>Manage subjects</p>
+                <a href="{% url 'register_setting_item' 'subject-model' %}" class="btn">➕ Add New Subject</a>
+                <a href="{% url 'view_setting_item' 'subject-model' %}" class="btn" style="background: #27ae60; margin-left: 10px;">👁 View Subjects</a>
+            </div>
+
+            <div class="settings-card">
+                <h3>🧑‍🏫📚 Assign Subjects </h3>
+                <p>Assign and manage subjects a teacher teaches</p>
+                <a href="{% url 'register_setting_item' 'teaching-assignment-model' %}" class="btn">➕ Add New Assignment</a>
+                <a href="{% url 'view_setting_item' 'teaching-assignment-model' %}" class="btn" style="background: #27ae60; margin-left: 10px;">👁 View Assignments</a>
+            </div>
+
+            <div class="settings-card">
+                <h3>💰 Fee Structure Components</h3>
+                <p>Define and manage fee components.</p>
+                <a href="{% url 'register_setting_item' 'fee-component' %}" class="btn">➕ Add Fee Component</a>
+                <a href="{% url 'view_setting_item' 'fee-component' %}" class="btn" style="background: #27ae60; margin-left: 10px;">👁 View Components</a>
+            </div>
+
+            <div class="settings-card">
+                <h3>💰 Fee Structure</h3>
+                <p>Define and manage fee structures.</p>
+                <a href="{% url 'register_setting_item' 'fee-structure' %}" class="btn btn-primary">➕ Add Fee Structure</a>
+                <a href="{% url 'view_setting_item' 'fee-structure' %}" class="btn" style="background: #27ae60; margin-left: 10px;">👁 View Fee Structures</a>
+            </div>
+        </div>
+
+        <p style="color: #aaa; font-size: 14px; margin-top: 20px;">
+            🚧 More configuration options coming soon.
+        </p>
+    </div>
+</div>
+<style>
+.settings-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.settings-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    justify-content: ;
+    align-items: center;
+}
+
+.settings-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.settings-card h3 {
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.settings-card p {
+    color: #666;
+    font-size: 15px;
+    margin-bottom: 15px;
+}
+
+/* Flex container for buttons */
+.settings-card .btn-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+/* Smaller, compact buttons with margin */
+.settings-card .btn {
+    display: inline-block;
+    padding: 6px 14px; 
+    font-size: 14px; 
+    background: #2980b9;
+    color: #fff;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.2s;
+    margin: 4px 0px; /* Add horizontal margin for separation */
+}
+
+.settings-card .btn:hover {
+    background: #1f6391;
+}
+
+/* Separate style for “View” button */
+.settings-card .btn.view-btn {
+    background: #27ae60;
+}
+
+.settings-card .btn.view-btn:hover {
+    background: #1f8a4d;
+}
+</style>
+
+
+
+{% endblock %}

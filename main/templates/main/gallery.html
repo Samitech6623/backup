@@ -1,0 +1,67 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block head %}
+{% block title %}<title>Our Academy Gallery</title>{% endblock %}
+<link rel="stylesheet" href="{% static 'css/gallery.css' %}">
+{% endblock %} 
+
+{% block content %}
+<div class="gallery-header">
+  <h1>Our Academy Gallery</h1>
+  <p>Take a peek into our happy, colorful world!</p>
+</div>
+
+<!-- Filter Buttons -->
+<div class="gallery-filters">
+  <button class="filter-button active" data-category="all">All</button>
+  <button class="filter-button" data-category="arts">Arts & Crafts</button>
+  <button class="filter-button" data-category="outdoor">Outdoor Play</button>
+  <button class="filter-button" data-category="events">Events</button>
+</div>
+
+<!-- Gallery Grid -->
+<section class="gallery">
+  <div class="photo-grid">
+
+    <!-- Example images -->
+    <figure class="gallery-item" data-category="arts">
+      <a href="{% static 'images/pic4.jpeg' %}" class="lightbox">
+        <img src="{% static 'images/pic4.jpeg' %}" alt="Art class">
+      </a>
+      <figcaption>Creative time in the art corner 🎨</figcaption>
+    </figure>
+
+    <figure class="gallery-item" data-category="outdoor">
+      <a href="{% static 'images/pic4.jpeg' %}" class="lightbox">
+        <img src="{% static 'images/pic4.jpeg' %}" alt="Outdoor play">
+      </a>
+      <figcaption>Outdoor playtime with friends ☀️</figcaption>
+    </figure>
+
+    <figure class="gallery-item" data-category="events">
+      <a href="{% static 'images/pic4.jpeg' %}" class="lightbox">
+        <img src="{% static 'images/pic4.jpeg' %}" alt="Event celebration">
+      </a>
+      <figcaption>Birthday celebration fun! 🎉</figcaption>
+    </figure>
+
+    <figure class="gallery-item" data-category="arts">
+      <a href="{% static 'images/pic4.jpeg' %}" class="lightbox">
+        <img src="{% static 'images/pic4.jpeg' %}" alt="Crafts">
+      </a>
+      <figcaption>Making colorful paper crafts ✂️</figcaption>
+    </figure>
+
+    <!-- Add more figures with appropriate data-category -->
+
+  </div>
+</section>
+
+<!-- Call to Action -->
+<section class="gallery-cta">
+  <p>Want to see more? Book a tour or visit us in person!</p>
+  <a href="{% url 'contact' %}" class="cta-button">Contact Us</a>
+</section>
+<script src="{% static 'js/gallery.js' %}"></script>
+{% endblock %}
